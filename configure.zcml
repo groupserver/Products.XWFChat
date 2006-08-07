@@ -1,0 +1,51 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+			xmlns:browser="http://namespaces.zope.org/browser"
+			xmlns:rdb="http://namespaces.zope.org/rdb"
+			xmlns:sqlos="http://namespaces.sqlobject.org/sqlos"
+			xmlns:five="http://namespaces.zope.org/five">
+	
+    <!-- declare a marker interface on the Folder class to allow us to adapt it to our view -->
+	<five:implements class="OFS.Folder.Folder"
+                 interface=".interfaces.IFolder" />
+    
+    <!-- make it known to Five -->
+    <five:traversable class="OFS.Folder.Folder"/>
+             
+	<browser:page
+  		for=".interfaces.IFolder"
+	    class=".chat.XWFChatView"
+  		name="chat.html"
+  		template="templates/test.pt"
+  		permission="zope2.View"
+	  />
+	<browser:page
+  		for=".interfaces.IFolder"
+	    class=".chat.XWFChatView"
+  		attribute="cb_chat"
+  		name="cb_chat"
+  		permission="zope2.View"
+	  />
+	<browser:page
+  		for=".interfaces.IFolder"
+	    class=".chat.XWFChatView"
+  		attribute="submit_message"
+  		name="submit_message"
+  		permission="zope2.View"
+	  />
+	  
+	<sqlos:connectionName name='ogs' />
+
+    <rdb:provideConnection name='ogs'
+         component='psycopgda.adapter.PsycopgAdapter'
+         dsn='dbi://richard@localhost:5432/onlinegroups.net' />
+	 
+	<adapter provides="sqlos.interfaces.IZopeSQLConnection"
+             for="zope.app.rdb.interfaces.IZopeConnection"
+             permission="zope.Public"
+             factory="sqlos.adapter.PostgresAdapter" />
+             
+	<!-- We try to create the tables at db open time -->
+    <subscriber handler=".chat.createTablesSubscriber"
+         for="zope.app.appsetup.interfaces.IDatabaseOpenedEvent" />
+	  
+</configure>
