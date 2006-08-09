@@ -1,4 +1,4 @@
-<html>
+<html xmlns:tal="http://xml.zope.org/namespaces/tal">
   <head>
     <style>
     	#chatmessages {
@@ -17,11 +17,11 @@
     	   font-size: 9px;
     	}
     </style>
-	<script language="JavaScript" type="text/javascript">
-    var djConfig = {
-       isDebug: true//,
-       //debugAtAllCosts: true
-    };
+    <script language="JavaScript" type="text/javascript">
+        var djConfig = {
+            isDebug: true//,
+            //debugAtAllCosts: true
+        };
     </script>
     <script language="JavaScript" type="text/javascript" src="Presentation/Tofu/Ajax/js/dojo/dojo.js"></script>
     <script language="JavaScript" type="text/javascript">
@@ -29,7 +29,7 @@
     maxChatMessages = 50;
     callbackBackoff = 10000;
     function cb_timeout() {
-        do_bind();
+        chatBind();
     };
     function populate_after_submit( type, data, event, kwArgs ){
         form = document.getElementById('chat_form');
@@ -88,12 +88,15 @@
         populate_messages( type, data, event, kwArgs);    
         tid = window.setTimeout( "cb_timeout()", delay /* milliseconds */);    
     };
-    function do_bind () {
+
+    function chatBind () {
+        form = document.getElementById('chat_form');
+        groupID = form['group_id'].value;
         dojo.io.bind({
 	url: "http://groupserver:8080/example_division/cb_chat",
 	load: cb_chat,
         mimetype: "text/json",
-        content: {'group_id': 'foo', 'last_timestamp': lastTimestamp},
+        content: {'group_id': groupID, 'last_timestamp': lastTimestamp},
 	error: function(type, data, event, kwArgs) { 
              alert('error');/* type will be "error", data will be response data,  event will null, and kwArgs are the keyword arguments used in the dojo.io.bind call. */ },
 	timeout: function() { alert('timeout'); /* Called if there is a timeout */},
@@ -101,7 +104,6 @@
         preventCache: true
         }); 
     }
-    do_bind();
 
     function chatForm() {
       var x = new dojo.io.FormBind({
@@ -117,6 +119,7 @@
     }
     
     dojo.addOnLoad(chatForm);
+    dojo.addOnLoad(chatBind)
 
     </script>
     <title tal:content="template/title">The title</title>
@@ -129,7 +132,7 @@
 
       <form id="chat_form" method="POST" action="http://groupserver:8080/example_division/submit_message">
           <input type="hidden" name="last_timestamp" value="" />
-          <input type="hidden" name="group_id" value="foo" />
+          <input type="hidden" name="group_id" tal:attributes="value python:request.get('group_id', 'default')" />
           <input type="text" name="message" value="" />
           <input type="submit" name="submit" value="send" />
       </form>

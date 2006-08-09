@@ -34,4 +34,10 @@
 	<subscriber handler=".chat.createTablesSubscriber"
 		for="zope.app.appsetup.interfaces.IDatabaseOpenedEvent" />
 
+        <browser:addMenuItem
+                class="OFS.Folder.Folder"
+                title="Blarg Folder"
+                description="Blarg Folder Description"
+                permission="zope.ManageContent"/>
+
 </configure>
