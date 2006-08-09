@@ -13,6 +13,8 @@ from sqlobject import IntCol, BoolCol, EnumCol, UnicodeCol
 from sqlobject import StringCol, FloatCol, DateTimeCol
 from sqlobject import sqlbuilder
 
+from DateTime import DateTime
+
 from jsonserver.jsoncomponent import JSONWriter
 #
 # In Zope 2.9, the IDatabaseOpenedEvent doesn't appear to get fired, so
@@ -37,11 +39,11 @@ class ChatMessage( SQLOS ):
 
 class XWFChatView(BrowserView):
     security = ClassSecurityInfo()
-    def cb_chat( self ):
+    def cb_chat( self, backoff=None ):
         group_id = self.request.form.get('group_id')
         last_timestamp = self.request.form.get('last_timestamp', 0)
-        if last_timestamp == 'null':
-            last_timestamp = 0
+        if last_timestamp in ('null', ''):
+            last_timestamp = str(DateTime()-(1.0/24.0))
         
         writer = JSONWriter()
         
@@ -49,16 +51,14 @@ class XWFChatView(BrowserView):
                                   ChatMessage.q.timestamp > last_timestamp) )
         
         messages = ChatMessage.select( clause, orderBy=ChatMessage.q.timestamp )
-        out = []
+        out = {'messages': [], 'backoff': backoff or 20000}
         for message in messages:
             msg = {}
             msg['user_id'] = message.user_id
             msg['timestamp'] = str(message.timestamp)
             msg['message'] = message.message
             
-            out.append(msg)
-      
-        out.reverse()
+            out['messages'].append(msg)
         
         return writer.write(out)
 
@@ -68,12 +68,11 @@ class XWFChatView(BrowserView):
         message = self.request.form.get('message')
         
         user_id = self.request.AUTHENTICATED_USER.getId()
-        
-        print user_id
-        print self.request
-        
+        if not user_id:
+            user_id = 'Anon'
+            
         ChatMessage(group_id=group_id, user_id=user_id, message=message)
-        messages = self.cb_chat( )
+        messages = self.cb_chat( backoff=8000 )
         
         return messages
 

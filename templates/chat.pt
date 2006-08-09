@@ -1,32 +1,90 @@
 <html>
   <head>
+    <style>
+    	#chatmessages {
+    	   background-color: #eeeeee;
+    	   overflow: auto;
+    	   height: 600;
+    	   width: 600;
+    	   font-size: 11px;
+    	}
+    	.userid {
+    	   color: blue;
+    	   font-size: 9px;
+    	}
+    	.timestamp {
+    	   color: blue;
+    	   font-size: 9px;
+    	}
+    </style>
+	<script language="JavaScript" type="text/javascript">
+    var djConfig = {
+       isDebug: true//,
+       //debugAtAllCosts: true
+    };
+    </script>
     <script language="JavaScript" type="text/javascript" src="Presentation/Tofu/Ajax/js/dojo/dojo.js"></script>
     <script language="JavaScript" type="text/javascript">
     lastTimestamp = null;
+    maxChatMessages = 50;
+    callbackBackoff = 10000;
     function cb_timeout() {
         do_bind();
     };
+    function populate_after_submit( type, data, event, kwArgs ){
+        form = document.getElementById('chat_form');
+        form['message'].value = '';
+        form['submit'].value = 'send';
+        form['submit'].disabled = false;
+        populate_messages( type, data, event, kwArgs );
+    };
+    
     function populate_messages( type, data, event, kwArgs ) {
-        chatMessages = document.getElementById('chatmessages');
-        chatMessages.innerHTML = "";
-        for (var x = 0; x &lt;= data.length-1; x++)
-        {
-           msgDiv = document.createElement("div");
-           msgDiv.innerHTML = data[x]['message']
-           msgDiv.className = 'message';
-           timeDiv = document.createElement("div");
-           timeDiv.innerHTML = data[x]['timestamp']
-           timeDiv.className = 'timestamp';
-           document.getElementById('chatmessages').appendChild(timeDiv);
-           document.getElementById('chatmessages').appendChild(msgDiv);
-        }
-        if (data.length &gt; 0) {
-           lastTimestamp = data[0]['timestamp'];	
-        }
         
+        chatMessages = document.getElementById('chatmessages');
+        form = document.getElementById('chat_form');
+        
+        callbackBackoff = data['backoff'];
+        
+        messages = data['messages'];
+        
+    	dojo.debug("Retrieved data, length is "+data['messages'].length);
+    	dojo.debug("Backoff set to", data['backoff']);
+        for (var x = 0; x < messages.length; x++)
+        {
+           msgContainer = document.createElement("div");
+           msgContainer.className = 'chatmessagecontainer';
+           msgDiv = document.createElement("div");
+           msgDiv.innerHTML = messages[x]['message']
+           msgDiv.className = 'message';
+           userDiv = document.createElement("div");
+           userDiv.innerHTML = 'user ID: '+messages[x]['user_id']
+           userDiv.className = 'userid';
+           timeDiv = document.createElement("div");
+           timeDiv.innerHTML = 'timestamp: '+messages[x]['timestamp']
+           timeDiv.className = 'timestamp';
+           
+           msgContainer.appendChild(timeDiv);
+           msgContainer.appendChild(userDiv);
+           msgContainer.appendChild(msgDiv);
+           
+           chatMessageLength = chatMessages.childNodes.length;
+           if (chatMessageLength >= maxChatMessages) {
+               chatMessages.removeChild(chatMessages.childNodes[0]);
+	           chatMessages.appendChild(msgContainer);
+	       } else {
+	           chatMessages.appendChild(msgContainer);;
+	       };
+	       
+	       lastTimestamp = messages[x]['timestamp'];
+	       
+           form['last_timestamp'].value = lastTimestamp;
+           
+           chatMessages.scrollTop = chatMessages.scrollHeight-chatMessages.clientHeight;
+        }
     };
     function cb_chat( type, data, event, kwArgs ) {
-        delay = 10000;
+        delay = callbackBackoff;
         populate_messages( type, data, event, kwArgs);    
         tid = window.setTimeout( "cb_timeout()", delay /* milliseconds */);    
     };
@@ -49,10 +107,15 @@
       var x = new dojo.io.FormBind({
       formNode: document.getElementById('chat_form'),
       mimetype: 'text/json',
-      load: populate_messages
+      load: populate_after_submit
       });
+      x.onSubmit = function (form) {
+      	form['submit'].disable = true;
+      	form['submit'].value = 'sending...';
+      	return true;
+      };
     }
-	
+    
     dojo.addOnLoad(chatForm);
 
     </script>
@@ -61,17 +124,17 @@
   <body>
     
     <h2>Richard's Seriously Simple AJAX Chat</h2>
-
-    Response:
-  
+    
        <div id="chatmessages"></div>
 
-    Send stuff:
       <form id="chat_form" method="POST" action="http://groupserver:8080/example_division/submit_message">
+          <input type="hidden" name="last_timestamp" value="" />
           <input type="hidden" name="group_id" value="foo" />
           <input type="text" name="message" value="" />
           <input type="submit" name="submit" value="send" />
       </form>
+
+    <div id=dojoDebugOutput></div>
 
   </body>
 </html>
