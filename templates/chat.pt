@@ -1,33 +1,85 @@
 <html xmlns:tal="http://xml.zope.org/namespaces/tal">
   <head>
     <style>
-    	#chatmessages {
-    	   background-color: #eeeeee;
-    	   overflow: auto;
-    	   height: 600;
-    	   width: 600;
+        #chatmessagespane {
+           border: 1px solid #000000;
+    	   height: 500px;
+    	   width: 500px;
     	   font-size: 11px;
+           float: left;
+           margin: 0px;
+           padding: 0px;
+    	}
+    	#chatmessages {
+    	   height: 500px;
+    	   width: 500px;
+    	   overflow: auto;
+    	}
+    	.chatmessagerowodd {
+           border-top: 1px solid #000000;
+           padding: 5px;
+    	   background-color: #cceeee;
+    	}
+    	.chatmessageroweven {
+           border-top: 1px solid #000000;
+           padding: 5px;
+    	   background-color: lightyellow;
+    	}
+    	#chatuserspane {
+    	   border: 1px solid #000000;
+    	   background-color: #ffffff;
+    	   overflow: auto;
+    	   height: 500px;
+    	   width: 200px;
+    	   font-size: 11px;
+    	   margin: 5px;
+    	   padding: 5px;
+    	}
+    	#chatusers {
+    	   overflow: auto;
+    	}
+    	#chatusers.userid {
+    	   margin: 0 5px 0 0;
+    	   color: blue;
+    	   font-size: 9px;
     	}
     	.userid {
+    	   float: left;
+    	   margin: 0 5px 0 0;
     	   color: blue;
     	   font-size: 9px;
     	}
     	.timestamp {
     	   color: blue;
     	   font-size: 9px;
+    	   clear: right;
     	}
+        form {
+           clear: both;
+        }
+		input.textinput {
+           width: 300;
+           border: solid 1px black;
+           padding: 5px;
+        }
+		input.submit {
+           border: solid 1px black;
+           background-color: yellow;
+           padding: 5px;
+		}
     </style>
     <script language="JavaScript" type="text/javascript">
         var djConfig = {
-            isDebug: true//,
-            //debugAtAllCosts: true
+            isDebug: false
         };
     </script>
     <script language="JavaScript" type="text/javascript" src="Presentation/Tofu/Ajax/js/dojo/dojo.js"></script>
     <script language="JavaScript" type="text/javascript">
+    dojo.require(dojo.date);
     lastTimestamp = null;
     maxChatMessages = 50;
     callbackBackoff = 10000;
+    oddRow = true;
     function cb_timeout() {
         chatBind();
     };
@@ -42,30 +94,40 @@
     function populate_messages( type, data, event, kwArgs ) {
         
         chatMessages = document.getElementById('chatmessages');
+        chatUsers = document.getElementById('chatusers');
         form = document.getElementById('chat_form');
         
         callbackBackoff = data['backoff'];
         
         messages = data['messages'];
-        
+        users = data['users'];
     	dojo.debug("Retrieved data, length is "+data['messages'].length);
     	dojo.debug("Backoff set to", data['backoff']);
         for (var x = 0; x < messages.length; x++)
         {
            msgContainer = document.createElement("div");
-           msgContainer.className = 'chatmessagecontainer';
+           
+           if (oddRow) {
+               msgContainer.className = 'chatmessagerowodd';
+           } else {
+               msgContainer.className = 'chatmessageroweven';
+           }
+           oddRow = !oddRow;
+           
+           
            msgDiv = document.createElement("div");
            msgDiv.innerHTML = messages[x]['message']
            msgDiv.className = 'message';
            userDiv = document.createElement("div");
-           userDiv.innerHTML = 'user ID: '+messages[x]['user_id']
+           userDiv.innerHTML = messages[x]['user_id']
            userDiv.className = 'userid';
            timeDiv = document.createElement("div");
-           timeDiv.innerHTML = 'timestamp: '+messages[x]['timestamp']
+           timestamp = dojo.date.fromIso8601(messages[x]['timestamp'])
+           timeDiv.innerHTML = '('+timestamp+')'
            timeDiv.className = 'timestamp';
            
-           msgContainer.appendChild(timeDiv);
            msgContainer.appendChild(userDiv);
+           msgContainer.appendChild(timeDiv);
            msgContainer.appendChild(msgDiv);
            
            chatMessageLength = chatMessages.childNodes.length;
@@ -82,6 +144,19 @@
            
            chatMessages.scrollTop = chatMessages.scrollHeight-chatMessages.clientHeight;
         }
+        chatUsers.innerHTML = '';
+        for (var x = 0; x < users.length; x++)
+        {
+           userContainer = document.createElement("div");
+           userContainer.className = 'chatusercontainer';
+           userDiv = document.createElement("div");
+           userDiv.innerHTML = users[x]['user_id']
+           userDiv.className = 'userid';
+           
+           userContainer.appendChild(userDiv);
+           
+           chatUsers.appendChild(userDiv);
+        }
     };
     function cb_chat( type, data, event, kwArgs ) {
         delay = callbackBackoff;
@@ -92,11 +167,12 @@
     function chatBind () {
         form = document.getElementById('chat_form');
         groupID = form['group_id'].value;
+        userID = form['user_id'].value;
         dojo.io.bind({
-	url: "http://groupserver:8080/example_division/cb_chat",
+	url: "http://wellington2.iopen.net:8080/example_division/cb_chat",
 	load: cb_chat,
         mimetype: "text/json",
-        content: {'group_id': groupID, 'last_timestamp': lastTimestamp},
+        content: {'group_id': groupID, 'user_id': userID, 'last_timestamp': lastTimestamp},
 	error: function(type, data, event, kwArgs) { 
              alert('error');/* type will be "error", data will be response data,  event will null, and kwArgs are the keyword arguments used in the dojo.io.bind call. */ },
 	timeout: function() { alert('timeout'); /* Called if there is a timeout */},
@@ -126,18 +202,23 @@
   </head>
   <body>
     
-    <h2>Richard's Seriously Simple AJAX Chat</h2>
-    
-       <div id="chatmessages"></div>
-
-      <form id="chat_form" method="POST" action="http://groupserver:8080/example_division/submit_message">
+       <div id="chatmessagespane">
+           <div id="chatmessages"></div>
+       </div>
+       <div id="chatuserspane">
+          <h3>Users</h3>
+          <div id="chatusers">Loading...</div>
+       </div>
+       
+      <form id="chat_form" method="POST" action="http://wellington2.iopen.net:8080/example_division/submit_message">
           <input type="hidden" name="last_timestamp" value="" />
+          <input tal:condition="request/form/user_id | nothing" type="hidden" name="user_id" tal:attributes="value request/form/user_id" />
           <input type="hidden" name="group_id" tal:attributes="value python:request.get('group_id', 'default')" />
-          <input type="text" name="message" value="" />
-          <input type="submit" name="submit" value="send" />
+          <input class="textinput" type="text" name="message" value="" />
+          <input class="submit" type="submit" name="submit" value="send" />
       </form>
 
-    <div id=dojoDebugOutput></div>
+    <div id="dojoDebugOutput"></div>
 
   </body>
 </html>
