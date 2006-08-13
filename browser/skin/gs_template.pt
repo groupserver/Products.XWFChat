@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      metal:define-macro="page">
+	<head>
+		<meta http-equiv="Content-Type"	content="text/html; charset=UTF8" />
+		
+		<metal:block define-slot="title" />
+		
+		<link rel="stylesheet" type="text/css" 
+		      href="/Presentation/Tofu/Common/css/globalstyle.css">
+		<link rel="stylesheet" type="text/css" media="print"
+		      href="/Presentation/Tofu/Common/css/print.css">
+		
+		<metal:block define-slot="style" />
+		<metal:block define-slot="javascript" />
+		
+	</head>
+	<body>
+		<div id="toparea">
+			<div id="externalbar">
+				<div id="externallinks" 
+                             		metal:define-slot="externallinks"
+                             	tal:content="structure python:getattr(context, 'menuexternal.xml')(method='html')" />
+			</div>
+			<div id="titlebar">
+				<span class="logo"></span>
+				<span class="group"></span>
+				<span class="division" tal:define="division_object python:context.Scripts.get.division_object()" tal:content="division_object/title_or_id | nothing">Division Name</span>
+			</div>
+			<div id="utilities">
+				<div id="utilitylinks">
+					<ul>
+						<li tal:condition="python:not user.getId()">
+							<a id="log-in-link" href="/login"
+								title="Log in here">
+								Log In
+							</a>
+						</li>
+						<li tal:condition="python:user.getId()"><a id="log-out-link" href="/cookie_authentication/logout">Log Out</a></li>
+						<li tal:condition="python:user.getId()"><a id="profile-link" href="/example_division/contacts/test/" title="Profile for Default Administrator">Default Administrator (profile)</a></li>
+					</ul>
+				</div>
+			</div>
+			<div id="sitenavigation" 
+                             metal:define-slot="sitenavigation"
+                             tal:content="structure python:getattr(context.Templates.output, 'menumain.xml')(method='html')" />
+		</div>
+		
+		<div id="contextnav">
+			<p class="label" tal:content="python:context.Scripts.get.sectionId().capitalize()">Section ID</p>
+			<span tal:replace="structure python:getattr(context, 'menuside.xml', getattr(context.Templates.output, 'menuside.xml'))(method='html')" />
+		</div>
+		
+		<div id="content">
+
+			<div class="breadcrumb" metal:define-slot="breadcrumb"
+			     tal:content="structure python:getattr(context.Templates.output, 'context.xml')(method='html')"/>
+			
+			<h1 metal:define-slot="pagetitle">Example Group Home</h1>
+    
+    		<metal:block define-slot="body" />
+
+		</div>
+	</body>
+</html>

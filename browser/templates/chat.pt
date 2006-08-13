@@ -1,0 +1,234 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      metal:use-macro="context/@@gs_template/page">
+	<head>
+    <title metal:fill-slot="title">The title</title>
+    <tal:block metal:fill-slot="style">
+	    <style>
+        #chatmessagespane {
+           border: 1px solid #000000;
+    	   height: 500px;
+    	   width: 500px;
+    	   font-size: 11px;
+           float: left;
+           margin: 0px;
+           padding: 0px;
+    	}
+    	#chatmessages {
+    	   height: 500px;
+    	   width: 500px;
+    	   overflow: auto;
+    	}
+    	.chatmessagerowodd {
+           border-top: 1px solid #000000;
+           padding: 5px;
+    	   background-color: #cceeee;
+    	}
+    	.chatmessageroweven {
+           border-top: 1px solid #000000;
+           padding: 5px;
+    	   background-color: lightyellow;
+    	}
+    	#chatuserspane {
+    	   border: 1px solid #000000;
+    	   background-color: #ffffff;
+    	   overflow: auto;
+    	   height: 500px;
+    	   width: 200px;
+    	   font-size: 11px;
+    	   margin: 5px;
+    	   padding: 5px;
+    	}
+    	#chatusers {
+    	   overflow: auto;
+    	}
+    	#chatusers.userid {
+    	   margin: 0 5px 0 0;
+    	   color: blue;
+    	   font-size: 9px;
+    	}
+    	.userid {
+    	   float: left;
+    	   margin: 0 5px 0 0;
+    	   color: blue;
+    	   font-size: 9px;
+    	}
+    	.timestamp {
+    	   color: blue;
+    	   font-size: 9px;
+    	   clear: right;
+    	}
+        form {
+           clear: both;
+        }
+		input.textinput {
+           width: 300;
+           border: solid 1px black;
+           padding: 5px;
+        }
+		input.submit {
+           border: solid 1px black;
+           background-color: yellow;
+           padding: 5px;
+		}
+		</style>
+    </tal:block>
+    <tal:block metal:fill-slot="javascript">
+    <script language="JavaScript" type="text/javascript">
+        var djConfig = {
+            isDebug: false
+        };
+    </script>
+    <script language="JavaScript" type="text/javascript" src="Presentation/Tofu/Ajax/js/dojo/dojo.js"></script>
+    <script language="JavaScript" type="text/javascript">
+    dojo.require(dojo.date);
+    lastTimestamp = null;
+    maxChatMessages = 50;
+    callbackBackoff = 10000;
+    oddRow = true;
+    function cb_timeout() {
+        chatBind();
+    };
+    function populate_after_submit( type, data, event, kwArgs ){
+        form = document.getElementById('chat_form');
+        form['message'].value = '';
+        form['submit'].value = 'send';
+        form['submit'].disabled = false;
+        populate_messages( type, data, event, kwArgs );
+    };
+    
+    function populate_messages( type, data, event, kwArgs ) {
+        
+        chatMessages = document.getElementById('chatmessages');
+        chatUsers = document.getElementById('chatusers');
+        form = document.getElementById('chat_form');
+        
+        callbackBackoff = data['backoff'];
+        
+        messages = data['messages'];
+        users = data['users'];
+    	dojo.debug("Retrieved data, length is "+data['messages'].length);
+    	dojo.debug("Backoff set to", data['backoff']);
+        for (var x = 0; x < messages.length; x++)
+        {
+           msgContainer = document.createElement("div");
+           
+           if (oddRow) {
+               msgContainer.className = 'chatmessagerowodd';
+           } else {
+               msgContainer.className = 'chatmessageroweven';
+           }
+           oddRow = !oddRow;
+           
+           msgDiv = document.createElement("div");
+           msgDiv.innerHTML = messages[x]['message']
+           msgDiv.className = 'message';
+           userDiv = document.createElement("div");
+           userDiv.innerHTML = messages[x]['user_id']
+           userDiv.className = 'userid';
+           timeDiv = document.createElement("div");
+           timestamp = dojo.date.fromIso8601(messages[x]['timestamp'])
+           timeDiv.innerHTML = '('+timestamp+')'
+           timeDiv.className = 'timestamp';
+           
+           msgContainer.appendChild(userDiv);
+           msgContainer.appendChild(timeDiv);
+           msgContainer.appendChild(msgDiv);
+           
+           chatMessageLength = chatMessages.childNodes.length;
+           if (chatMessageLength >= maxChatMessages) {
+               chatMessages.removeChild(chatMessages.childNodes[0]);
+	           chatMessages.appendChild(msgContainer);
+	       } else {
+	           chatMessages.appendChild(msgContainer);;
+	       };
+	       
+	       lastTimestamp = messages[x]['timestamp'];
+	       
+           form['last_timestamp'].value = lastTimestamp;
+           
+           chatMessages.scrollTop = chatMessages.scrollHeight-chatMessages.clientHeight;
+        }
+        chatUsers.innerHTML = '';
+        for (var x = 0; x < users.length; x++)
+        {
+           userContainer = document.createElement("div");
+           userContainer.className = 'chatusercontainer';
+           userDiv = document.createElement("div");
+           userDiv.innerHTML = users[x]['user_id']
+           userDiv.className = 'userid';
+           
+           userContainer.appendChild(userDiv);
+           
+           chatUsers.appendChild(userDiv);
+        }
+    };
+    function cb_chat( type, data, event, kwArgs ) {
+        delay = callbackBackoff;
+        populate_messages( type, data, event, kwArgs);    
+        tid = window.setTimeout( "cb_timeout()", delay /* milliseconds */);    
+    };
+
+    function onErrorHandler ( type, data, event, kwArgs ) {
+        delay = callbackBackoff;
+        tid = window.setTimeout( "cb_timeout()", delay /* milliseconds */);    
+    };
+
+    function chatBind () {
+        form = document.getElementById('chat_form');
+        groupID = form['group_id'].value;
+        userID = form['user_id'].value;
+        dojo.io.bind({
+        	url: "http://wellington2.iopen.net:8080/cb_chat",
+			load: cb_chat,
+        	mimetype: "text/json",
+        	content: {'group_id': groupID, 'user_id': userID, 'last_timestamp': lastTimestamp},
+			error: onErrorHandler,
+			timeout: onErrorHandler,
+			timeoutSeconds: 10, //The number of seconds to wait until firing timeout callback in case of timeout.
+        	preventCache: true
+        }); 
+    }
+	
+    function chatForm() {
+      var x = new dojo.io.FormBind({
+      formNode: document.getElementById('chat_form'),
+      mimetype: 'text/json',
+      load: populate_after_submit
+      });
+      x.onSubmit = function (form) {
+      	form['submit'].disable = true;
+      	form['submit'].value = 'sending...';
+      	return true;
+      };
+    }
+    
+    dojo.addOnLoad(chatForm);
+    dojo.addOnLoad(chatBind)
+
+    </script>
+  </tal:block>
+  </head> 
+  <body metal:fill-slot="body" tal:omit-tag="">
+    
+       <div id="chatmessagespane">
+           <div id="chatmessages"></div>
+       </div>
+       <div id="chatuserspane">
+          <h3>Users</h3>
+          <div id="chatusers">Loading...</div>
+       </div>
+       
+      <form id="chat_form" method="POST" action="http://wellington2.iopen.net:8080/submit_message">
+          <input type="hidden" name="last_timestamp" value="" />
+          <input tal:condition="request/form/user_id | nothing" type="hidden" name="user_id" tal:attributes="value request/form/user_id" />
+          <input type="hidden" name="group_id" tal:attributes="value python:request.get('group_id', 'default')" />
+          <input class="textinput" type="text" name="message" value="" />
+          <input class="submit" type="submit" name="submit" value="send" />
+      </form>
+
+    <div id="dojoDebugOutput"></div>
+
+  </body>
+</html>
