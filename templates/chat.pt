@@ -1,6 +1,11 @@
-<html xmlns:tal="http://xml.zope.org/namespaces/tal">
-  <head>
-    <style>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      metal:use-macro="context/@@gs_template/page">
+	<head>
+    <title metal:fill-slot="title">The title</title>
+    <tal:block metal:fill-slot="style">
+	    <style>
         #chatmessagespane {
            border: 1px solid #000000;
     	   height: 500px;
@@ -67,7 +72,9 @@
            background-color: yellow;
            padding: 5px;
 		}
-    </style>
+		</style>
+    </tal:block>
+    <tal:block metal:fill-slot="javascript">
     <script language="JavaScript" type="text/javascript">
         var djConfig = {
             isDebug: false
@@ -113,7 +120,6 @@
                msgContainer.className = 'chatmessageroweven';
            }
            oddRow = !oddRow;
-           
            
            msgDiv = document.createElement("div");
            msgDiv.innerHTML = messages[x]['message']
@@ -164,23 +170,27 @@
         tid = window.setTimeout( "cb_timeout()", delay /* milliseconds */);    
     };
 
+    function onErrorHandler ( type, data, event, kwArgs ) {
+        delay = callbackBackoff;
+        tid = window.setTimeout( "cb_timeout()", delay /* milliseconds */);    
+    };
+
     function chatBind () {
         form = document.getElementById('chat_form');
         groupID = form['group_id'].value;
         userID = form['user_id'].value;
         dojo.io.bind({
-	url: "http://wellington2.iopen.net:8080/example_division/cb_chat",
-	load: cb_chat,
-        mimetype: "text/json",
-        content: {'group_id': groupID, 'user_id': userID, 'last_timestamp': lastTimestamp},
-	error: function(type, data, event, kwArgs) { 
-             alert('error');/* type will be "error", data will be response data,  event will null, and kwArgs are the keyword arguments used in the dojo.io.bind call. */ },
-	timeout: function() { alert('timeout'); /* Called if there is a timeout */},
-	timeoutSeconds: 10, //The number of seconds to wait until firing timeout callback in case of timeout.
-        preventCache: true
+        	url: "http://wellington2.iopen.net:8080/cb_chat",
+			load: cb_chat,
+        	mimetype: "text/json",
+        	content: {'group_id': groupID, 'user_id': userID, 'last_timestamp': lastTimestamp},
+			error: onErrorHandler,
+			timeout: onErrorHandler,
+			timeoutSeconds: 10, //The number of seconds to wait until firing timeout callback in case of timeout.
+        	preventCache: true
         }); 
     }
-
+	
     function chatForm() {
       var x = new dojo.io.FormBind({
       formNode: document.getElementById('chat_form'),
@@ -198,9 +208,9 @@
     dojo.addOnLoad(chatBind)
 
     </script>
-    <title tal:content="template/title">The title</title>
-  </head>
-  <body>
+  </tal:block>
+  </head> 
+  <body metal:fill-slot="body" tal:omit-tag="">
     
        <div id="chatmessagespane">
            <div id="chatmessages"></div>
@@ -210,7 +220,7 @@
           <div id="chatusers">Loading...</div>
        </div>
        
-      <form id="chat_form" method="POST" action="http://wellington2.iopen.net:8080/example_division/submit_message">
+      <form id="chat_form" method="POST" action="http://wellington2.iopen.net:8080/submit_message">
           <input type="hidden" name="last_timestamp" value="" />
           <input tal:condition="request/form/user_id | nothing" type="hidden" name="user_id" tal:attributes="value request/form/user_id" />
           <input type="hidden" name="group_id" tal:attributes="value python:request.get('group_id', 'default')" />
