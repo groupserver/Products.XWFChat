@@ -16,6 +16,7 @@
 		<metal:block define-slot="style" />
 		<metal:block define-slot="javascript" />
 		
+		<base tal:attributes="href request/URL1" />
 	</head>
 	<body>
 		<div id="toparea">
