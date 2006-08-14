@@ -1,9 +1,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
-      xmlns:tal="http://xml.zope.org/namespaces/tal">
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      metal:use-macro="context/@@gs_template/page">
 	<head>
-    <title>The title</title>
-    <tal:block>
+    <title metal:fill-slot="title">The title</title>
+    <tal:block metal:fill-slot="style">
 	    <style>
         #chatmessagespane {
            border: 1px solid #000000;
@@ -73,7 +74,7 @@
 		}
 		</style>
     </tal:block>
-    <tal:block tal:omit-tag="">
+    <tal:block metal:fill-slot="javascript">
     <script language="JavaScript" type="text/javascript">
         var djConfig = {
             isDebug: false
@@ -208,9 +209,9 @@
 
     </script>
   </tal:block>
+  
   </head> 
-  <body>
-    
+  <body metal:fill-slot="body" tal:omit-tag="">
        <div id="chatmessagespane">
            <div id="chatmessages"></div>
        </div>
@@ -219,7 +220,7 @@
           <div id="chatusers">Loading...</div>
        </div>
        
-      <form id="chat_form" method="POST" action="http://wellington2.iopen.net:8080/submit_message">
+      <form id="chat_form" method="POST" action="http://wellington2.iopen.net:8080/submit_message2">
           <input type="hidden" name="last_timestamp" value="" />
           <input tal:condition="request/form/user_id | nothing" type="hidden" name="user_id" tal:attributes="value request/form/user_id" />
           <input type="hidden" name="group_id" tal:attributes="value python:request.get('group_id', 'default')" />
@@ -228,6 +229,5 @@
       </form>
 
     <div id="dojoDebugOutput"></div>
-
   </body>
 </html>
