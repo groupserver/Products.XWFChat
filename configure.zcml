@@ -5,37 +5,41 @@
 	xmlns:five="http://namespaces.zope.org/five">
 
 	<!-- declare a marker interface on the Folder class to allow us 
-             to add marker Interfaces, views and adaptation -->
+		to add marker Interfaces, views and adaptation -->
 	<five:implements class="OFS.Folder.Folder"
 		interface="zope.app.folder.interfaces.IFolder" />
 
 	<!-- make it known to Five -->
 	<five:traversable class="OFS.Folder.Folder" />
-        
+
+	<browser:page for="*" class=".chat.XWFChatView"
+		name="hello.html" template="browser/templates/standard_template.pt"
+		permission="zope2.View" />
+
 	<browser:page for=".interfaces.IGSChat" class=".chat.XWFChatView"
-		name="chat.html" template="browser/templates/chat.pt" permission="zope2.View" />
+		name="chat.html" template="browser/templates/chat.pt"
+		permission="zope2.View" />
 	<browser:page for=".interfaces.IGSChat" class=".chat.XWFChatView"
 		attribute="cb_chat" name="cb_chat" permission="zope2.View" />
 	<browser:page for=".interfaces.IGSChat" class=".chat.XWFChatView"
 		attribute="submit_message" name="submit_message"
 		permission="zope2.View" />
 
-	<browser:page for="zope.app.folder.interfaces.IFolder" class=".chat.XWFChatView"
-		name="chat.html" template="browser/templates/chat.pt" permission="zope2.View" />
-	<browser:page for="zope.app.folder.interfaces.IFolder" class=".chat.XWFChatView"
-		attribute="cb_chat" name="cb_chat" permission="zope2.View" />
-	<browser:page for="zope.app.folder.interfaces.IFolder" class=".chat.XWFChatView"
-		attribute="submit_message" name="submit_message"
+	<browser:page for="zope.app.folder.interfaces.IFolder"
+		class=".chat.XWFChatView" name="chat.html"
+		template="browser/templates/chat.pt" permission="zope2.View" />
+	<browser:page for="zope.app.folder.interfaces.IFolder"
+		class=".chat.XWFChatView" attribute="cb_chat" name="cb_chat"
+		permission="zope2.View" />
+	<browser:page for="zope.app.folder.interfaces.IFolder"
+		class=".chat.XWFChatView" attribute="submit_message"
+		name="submit_message" permission="zope2.View" />
+
+	<browser:page for="zope.app.folder.interfaces.IFolder"
+		class=".chat.XWFChatView" name="chat2.html"
+		template="browser/templates/chat_with_template.pt"
 		permission="zope2.View" />
 		
-	<browser:page for="zope.app.folder.interfaces.IFolder" class=".chat.XWFChatView"
-		name="chat2.html" template="browser/templates/chat_with_template.pt" permission="zope2.View" />
-	<browser:page for="zope.app.folder.interfaces.IFolder" class=".chat.XWFChatView"
-		attribute="cb_chat" name="cb_chat2" permission="zope2.View" />
-	<browser:page for="zope.app.folder.interfaces.IFolder" class=".chat.XWFChatView"
-		attribute="submit_message" name="submit_message2"
-		permission="zope2.View" />
-
 	<!-- setup our Database connectivity -->
 	<sqlos:connectionName name='ogs' />
 
@@ -51,32 +55,37 @@
 	<subscriber handler=".chat.createTablesSubscriber"
 		for="zope.app.appsetup.interfaces.IDatabaseOpenedEvent" />
 
-        <browser:addMenuItem
-                class="OFS.Folder.Folder"
-                title="Blarg Folder"
-                description="Blarg Folder Description"
-                permission="zope.ManageContent"/>
-        
-        <browser:resourceDirectory name="smileys"
-                  directory="icons/smileys/default" permission="zope2.View" />
+	<browser:addMenuItem class="OFS.Folder.Folder" title="Blarg Folder"
+		description="Blarg Folder Description"
+		permission="zope.ManageContent" />
 
-	<interface interface=".interfaces.IGSGroupFolder" type="zope.app.content.interfaces.IContentType" />
-	<interface interface=".interfaces.IGSChat" type="zope.app.content.interfaces.IContentType" />
+	<browser:resourceDirectory name="smileys"
+		directory="browser/icons/smileys/default" permission="zope2.View" />
+		
+	<browser:resourceDirectory name="icons"
+		directory="browser/icons" permission="zope2.View" />
 
-    <browser:page
-        for="*"
-        template="browser/skin/gs_template.pt"
-        name="gs_template"
-        permission="zope.Public" />
+	<browser:resourceDirectory name="dojo"
+		directory="browser/javascript/dojo/" permission="zope2.View" />
 
-    <browser:layer name="tofu" />
-    <browser:skin name="Groupserver" layers="tofu default" />
+	<browser:resource name="chat.css"
+		file="browser/stylesheets/chat.css" permission="zope2.View" />
+	<browser:resource name="chat.js"
+		file="browser/javascript/chat.js" permission="zope2.View" />
 
-    <browser:page
-        for="*"
-        template="browser/skin/tofu_template.pt"
-        name="gs_template"
-        layer="tofu"
-        permission="zope.Public" />
+	<interface interface=".interfaces.IGSGroupFolder"
+		type="zope.app.content.interfaces.IContentType" />
+	<interface interface=".interfaces.IGSChat"
+		type="zope.app.content.interfaces.IContentType" />
+
+
+	<browser:page for="*" template="browser/skin/gs_template.pt"
+		name="gs_template" permission="zope.Public" />
+
+	<browser:layer name="tofu" />
+	<browser:skin name="Groupserver" layers="tofu default" />
+
+	<browser:page for="*" template="browser/skin/tofu_template.pt"
+		name="gs_template" layer="tofu" permission="zope.Public" />
 
 </configure>

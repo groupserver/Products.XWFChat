@@ -13,8 +13,7 @@ from zope.app.container import constraints
 from sqlos.container import SQLObjectContainer
 from sqlos.interfaces.container import ISQLObjectContainer
 
-from sqlobject import IntCol, BoolCol, EnumCol, UnicodeCol
-from sqlobject import StringCol, FloatCol, DateTimeCol
+from sqlobject import UnicodeCol, DateTimeCol
 from sqlobject import sqlbuilder
 
 from DateTime import DateTime
@@ -25,6 +24,8 @@ from feedparser import _HTMLSanitizer, _sanitizeHTML as sanitizeHTML #@Unresolve
 
 from formencode import validators #@UnresolvedImport
 import time
+
+import md5
 
 # for some reason occasionally the wrong type of DateTime shows up. Bad.
 def to_pythonPATCH( self, value, state ):
@@ -59,14 +60,14 @@ def createTables():
         table.createTable( ifNotExists=True )
                                   
 class ChatMessage( SQLOS ):
-    user_id = StringCol( notNull=True )
-    group_id = StringCol( notNull=True )
+    user_id = UnicodeCol( notNull=True )
+    group_id = UnicodeCol( notNull=True )
     timestamp = DateTimeCol( notNull=True, default=sqlbuilder.func.NOW() ) #@UndefinedVariable
-    message = StringCol( notNull=True )
+    message = UnicodeCol( notNull=True )
 
 class ChatUser( SQLOS ):
-    user_id = StringCol( notNull=True )
-    group_id = StringCol( notNull=True )
+    user_id = UnicodeCol( notNull=True )
+    group_id = UnicodeCol( notNull=True )
     joined = DateTimeCol( notNull=True, default=sqlbuilder.func.NOW() ) #@UndefinedVariable
     last_seen = DateTimeCol( notNull=True, default=sqlbuilder.func.NOW() ) #@UndefinedVariable
     last_message = DateTimeCol( notNull=False, default=None )
@@ -129,13 +130,22 @@ class XWFChatView( BrowserView ):
     backoffAfterMessage = 7 # seconds
     assumePartedAfter = 120 # seconds
     updateLastSeenAfter = 60 # don't update unless this many seconds have elapsed
+    pastUsersTimeLimit = 86400*3 # 3 days
+    maximumMessageAge = 3600*6 # 6 hours
+    
+    def title( self ):
+        return 'Group Chat'
     
     def _get_request_dict( self ):
         #createTables()
         rdict = {}
         rdict['group_id'] = self.request.form.get( 'group_id' )
         rdict['message'] = self.request.form.get( 'message', '' ).strip()
+        
+        rdict['message'] = rdict['message'].decode('utf-8')
+        
         rdict['last_timestamp'] = self.request.form.get( 'last_timestamp', 0 )
+        rdict['last_checksum'] = self.request.form.get( 'last_checksum', '' )
         
         #rdict['user_id'] = self.request.AUTHENTICATED_USER.getId()
         #if not rdict['user_id']:
@@ -170,30 +180,36 @@ class XWFChatView( BrowserView ):
         
         users = ChatUser.select( clause, orderBy=ChatUser.q.user_id )
         ulist = []
+        olist= []
         for user in users:
             udict = {}
-            last_seen = user.last_seen
-            if last_seen:
-                if time_delta_to_now_from_string( last_seen ) >= self.assumePartedAfter:
-                    continue
-                
+            
             udict['user_id'] = user.user_id
             udict['joined'] = str( user.joined )
             udict['last_message'] = str( user.last_message )
+                    
+            last_seen = user.last_seen
+            if last_seen:
+                time_delta = time_delta_to_now_from_string( last_seen )
+                if time_delta >= self.assumePartedAfter:
+                    if time_delta <= self.pastUsersTimeLimit:
+                        olist.append( udict )                    
+                    continue
+                
             ulist.append( udict )
         
         last_timestamp = rdict['last_timestamp']
         if last_timestamp in ( 'null', '' ):
-            last_timestamp = str( DateTime()-( 1.0/24.0 ) )
+            last_timestamp = str( DateTime()-( self.maximumMessageAge/86400.0 ) )
         
         writer = JSONWriter()
         
         clause = ( sqlbuilder.AND( ChatMessage.q.group_id == rdict['group_id'], 
-                                  ChatMessage.q.timestamp > last_timestamp ) )
+                                   ChatMessage.q.timestamp > last_timestamp ) )
         
         messages = ChatMessage.select( clause, orderBy=ChatMessage.q.timestamp )
         # backoff is converted to milliseconds
-        out = {'messages': [], 'users': ulist,
+        out = {'messages': [], 'users': ulist, 'past_users': olist,
                'backoff': ( backoff or self.defaultBackoff )*1000.0}
         if not skip_messages:
             for message in messages:
@@ -203,7 +219,11 @@ class XWFChatView( BrowserView ):
                 msg['timestamp'] = message.timestamp.isoformat()
                 msg['message'] = markup_message( message.message )
                 
-                out['messages'].append( msg )
+                msg['checksum'] = md5.new(rdict['group_id']+msg['user_id']+msg['message']).hexdigest()
+                
+                # an extra paranoid double check
+                if msg['checksum'] != rdict['last_checksum']:
+                    out['messages'].append( msg )
             
         return writer.write( out )
 
@@ -211,18 +231,13 @@ class XWFChatView( BrowserView ):
         rdict = self._get_request_dict()
         now_dt = datetime.datetime.now()
         
-        clause = ( sqlbuilder.AND( ChatMessage.q.group_id == rdict['group_id'], 
-                                  ChatMessage.q.user_id == rdict['user_id'] ) )
+        checksum = md5.new(rdict['group_id']+rdict['user_id']+rdict['message']).hexdigest()
         
-        past_messages = ChatMessage.select( clause, orderBy=ChatMessage.q.timestamp )
+        # skip because we've already seen this before!
         messages = {}
-        if past_messages.count():
-            past_messages = past_messages.reversed()
-            past_messages = past_messages.limit( 1 )
-            message = past_messages[0]
-            if message.message == rdict['message']:
-                messages = self.cb_chat( backoff=self.defaultBackoff,
-                                         skip_user_update=True, skip_messages=True )
+        if rdict['last_checksum'] == checksum:
+            messages = self.cb_chat( backoff=self.defaultBackoff,
+                                     skip_user_update=True, skip_messages=True )
         
         if not messages and not rdict['message']:
             messages = self.cb_chat( backoff=self.defaultBackoff,

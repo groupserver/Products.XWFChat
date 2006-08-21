@@ -8,13 +8,14 @@
 		
 		<metal:block define-slot="title" />
 		
+		
+		<metal:block define-slot="javascript" />
+		
 		<link rel="stylesheet" type="text/css" 
 		      href="/Presentation/Tofu/Common/css/globalstyle.css">
 		<link rel="stylesheet" type="text/css" media="print"
 		      href="/Presentation/Tofu/Common/css/print.css">
-		
 		<metal:block define-slot="style" />
-		<metal:block define-slot="javascript" />
 		
 		<base tal:attributes="href request/URL1" />
 	</head>
