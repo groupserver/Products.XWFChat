@@ -1,0 +1,13 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      metal:use-macro="context/@@gs_template/page">
+	<head>
+    <title metal:fill-slot="title" tal:content="view/title | nothing">The title</title>
+  </head> 
+  <body metal:fill-slot="body" tal:omit-tag="">
+
+		<span tal:replace="structure python:getattr(context, 'content_en.xml')(method='html')" />
+
+  </body>
+</html>
