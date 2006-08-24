@@ -24,12 +24,13 @@
 			<div id="externalbar">
 				<div id="externallinks" 
                              		metal:define-slot="externallinks"
-                             	tal:content="structure python:getattr(context, 'menuexternal.xml')(method='html')" />
+                             	tal:content="structure python:getattr(context, 'menuexternal.xml', getattr(context.Templates.output, 'menuexternal.xml'))(method='html')" />
 			</div>
 			<div id="titlebar">
 				<span class="logo"></span>
 				<span class="group"></span>
-				<span class="division" tal:define="division_object python:context.Scripts.get.division_object()" tal:content="division_object/title_or_id | nothing">Division Name</span>
+				<span class="division" tal:define="division_object python:context.Scripts.get.division_object()"
+                                                       tal:content="division_object/title_or_id | nothing">Division Name</span>
 			</div>
 			<div id="utilities">
 				<div id="utilitylinks">
@@ -41,13 +42,14 @@
 							</a>
 						</li>
 						<li tal:condition="python:user.getId()"><a id="log-out-link" href="/cookie_authentication/logout">Log Out</a></li>
-						<li tal:condition="python:user.getId()"><a id="profile-link" href="/example_division/contacts/test/" title="Profile for Default Administrator">Default Administrator (profile)</a></li>
+						<li tal:condition="python:user.getId()"><a id="profile-link" tal:attributes="href string:/contacts/${user/getId}/;
+                                              title string:Profile for ${user/preferredName | nothing}"><span tal:replace="string:${user/preferredName | nothing} ${user/lastName | nothing}"/> (profile)</a></li>
 					</ul>
 				</div>
 			</div>
 			<div id="sitenavigation" 
                              metal:define-slot="sitenavigation"
-                             tal:content="structure python:getattr(context.Templates.output, 'menumain.xml')(method='html')" />
+                             tal:content="structure python:getattr(context, 'menumain.xml', getattr(context.Templates.output, 'menumain.xml'))(method='html')" />
 		</div>
 		
 		<div id="contextnav">
@@ -60,7 +62,7 @@
 			<div class="breadcrumb" metal:define-slot="breadcrumb"
 			     tal:content="structure python:getattr(context.Templates.output, 'context.xml')(method='html')"/>
 			
-			<h1 metal:define-slot="pagetitle">Example Group Home</h1>
+			<h1 metal:define-slot="pagetitle">Page Title</h1>
     
     		<metal:block define-slot="body" />
 

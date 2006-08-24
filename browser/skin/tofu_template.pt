@@ -22,7 +22,7 @@
 			<div id="externalbar">
 			<div id="externallinks" 
                              metal:define-slot="externallinks"
-                             tal:content="structure python:getattr(context, 'menuexternal.xml')" />
+                             tal:content="structure python:getattr(context, 'menuexternal.xml')(method='html')" />
 			</div>
 			<div id="titlebar">
 				<span class="logo"></span>
@@ -43,12 +43,12 @@
 			</div>
 			<div id="sitenavigation" 
                              metal:define-slot="sitenavigation"
-                             tal:content="structure python:getattr(context.Templates.output, 'menumain.xml')" />
+                             tal:content="structure python:getattr(context.Templates.output, 'menumain.xml')(method='html')" />
 		</div>
 		
 		<div id="contextnav">
 			<p class="label" tal:content="python:context.Scripts.get.sectionId().capitalize()">Section ID</p>
-			<span tal:replace="structure python:getattr(context, 'menuside.xml')" />
+			<span tal:replace="structure python:getattr(context, 'menuside.xml')(method='html')" />
 		</div>
 		
 		<div id="content">
