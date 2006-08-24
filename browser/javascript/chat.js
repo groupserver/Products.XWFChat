@@ -7,6 +7,7 @@ dojoCurrentRequest = null;
 currentTimeoutId = null;
 maxChatMessages = 50;
 callbackBackoff = 10000;
+timeout = 30;
 oddRow = true;
 
 function cb_timeout() {
@@ -32,7 +33,7 @@ function populate_user_list( user_container_object, data ) {
        
        userDiv = document.createElement("div");
        userDiv.id = 'chatuserid_'+data[x]['user_id'];
-       userDiv.innerHTML = data[x]['user_id'];
+       userDiv.innerHTML = data[x]['user_realname'];
        userDiv.className = 'chatuserid';
        
        userContainer.appendChild(userDiv);
@@ -46,7 +47,7 @@ function populate_user_list( user_container_object, data ) {
                                                        showDelay: 0 });
        
        timestamp = dojo.date.fromIso8601(data[x]['last_message']);
-       tooltip.setContent('<b>user</b>: '+data[x]['user_id']+'<br/><b>last message:</b> '+timestamp);
+       tooltip.setContent('<b>user</b>: '+data[x]['user_realname']+'<br/><b>last message:</b> '+timestamp);
     }
   
 
@@ -83,7 +84,7 @@ function populate_messages( type, data, event, kwArgs ) {
        msgDiv.innerHTML = messages[x]['message']
        msgDiv.className = 'message';
        userDiv = document.createElement("div");
-       userDiv.innerHTML = messages[x]['user_id']
+       userDiv.innerHTML = messages[x]['user_realname']
        userDiv.className = 'userid';
        timeDiv = document.createElement("div");
        timestamp = dojo.date.fromIso8601(messages[x]['timestamp'])
@@ -135,13 +136,13 @@ function chatBind () {
     userID = form['user_id'].value;
     dojoCurrentRequest = dojo.io.bind({
     	url: "cb_chat",
-		load: cb_chat,
+	load: cb_chat,
     	mimetype: "text/json",
     	encoding: "utf-8",
     	content: {'group_id': groupID, 'user_id': userID, 'last_timestamp': lastTimestamp, 'last_checksum': lastChecksum},
-		error: onErrorHandler,
-		timeout: onErrorHandler,
-		timeoutSeconds: 10, //The number of seconds to wait until firing timeout callback in case of timeout.
+	error: onErrorHandler,
+	timeout: onErrorHandler,
+	timeoutSeconds: timeout, //The number of seconds to wait until firing timeout callback in case of timeout.
     	preventCache: true
     }); 
 }
@@ -154,7 +155,7 @@ function chatForm() {
   load: populate_after_submit,
   error: onErrorHandler,
   timeout: onErrorHandler,
-  timeoutSeconds: 10
+  timeoutSeconds: timeout
   });
   x.onSubmit = function (form) {
     // Make sure we don't double up on requests
