@@ -132,7 +132,7 @@ class XWFChatView( BrowserView ):
     updateLastSeenAfter = 60 # don't update unless this many seconds have elapsed
     pastUsersTimeLimit = 86400*3 # 3 days
     maximumMessageAge = 3600*6 # 6 hours
-    
+        
     def title( self ):
         return 'Group Chat'
     
@@ -165,6 +165,10 @@ class XWFChatView( BrowserView ):
             chat_user = chat_users[0]
             
         return chat_user
+
+    def _get_chat_user_realname( self, user_id ):
+        # DEPRECATED
+        return self.context.Scripts.get.user_realnames( user_id, True )
     
     def cb_chat( self, backoff=None, skip_user_update=False, skip_messages=False ):
         rdict = self._get_request_dict()
@@ -185,6 +189,7 @@ class XWFChatView( BrowserView ):
             udict = {}
             
             udict['user_id'] = user.user_id
+            udict['user_realname'] = self._get_chat_user_realname( user.user_id )
             udict['joined'] = str( user.joined )
             udict['last_message'] = str( user.last_message )
                     
@@ -216,6 +221,7 @@ class XWFChatView( BrowserView ):
                 msg = {}
                 
                 msg['user_id'] = message.user_id
+                msg['user_realname'] = self._get_chat_user_realname( message.user_id )
                 msg['timestamp'] = message.timestamp.isoformat()
                 msg['message'] = markup_message( message.message )
                 
