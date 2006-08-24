@@ -16,18 +16,6 @@
 		name="hello.html" template="browser/templates/standard_template.pt"
 		permission="zope2.View" />
 
-	<browser:page for=".interfaces.IGSChat" class=".chat.XWFChatView"
-		name="chat.html" template="browser/templates/chat.pt"
-		permission="zope2.View" />
-	<browser:page for=".interfaces.IGSChat" class=".chat.XWFChatView"
-		attribute="cb_chat" name="cb_chat" permission="zope2.View" />
-	<browser:page for=".interfaces.IGSChat" class=".chat.XWFChatView"
-		attribute="submit_message" name="submit_message"
-		permission="zope2.View" />
-
-	<browser:page for="zope.app.folder.interfaces.IFolder"
-		class=".chat.XWFChatView" name="chat.html"
-		template="browser/templates/chat.pt" permission="zope2.View" />
 	<browser:page for="zope.app.folder.interfaces.IFolder"
 		class=".chat.XWFChatView" attribute="cb_chat" name="cb_chat"
 		permission="zope2.View" />
@@ -35,8 +23,8 @@
 		class=".chat.XWFChatView" attribute="submit_message"
 		name="submit_message" permission="zope2.View" />
 
-	<browser:page for="zope.app.folder.interfaces.IFolder"
-		class=".chat.XWFChatView" name="chat2.html"
+	<browser:page for=".interfaces.IGSChat"
+		class=".chat.XWFChatView" name="chat.html"
 		template="browser/templates/chat_with_template.pt"
 		permission="zope2.View" />
 		
@@ -45,7 +33,7 @@
 
 	<rdb:provideConnection name='ogs'
 		component='psycopgda.adapter.PsycopgAdapter'
-		dsn='dbi://richard@localhost:5432/onlinegroups.net' />
+		dsn='dbi://onlinegroups.net:ogs.net@localhost:5432/onlinegroups.net' />
 
 	<adapter provides="sqlos.interfaces.IZopeSQLConnection"
 		for="zope.app.rdb.interfaces.IZopeConnection" permission="zope.Public"
