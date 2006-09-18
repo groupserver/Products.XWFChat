@@ -27,6 +27,10 @@ import time
 
 import md5
 
+import ThreadLock
+ 
+_thread_lock = ThreadLock.allocate_lock()
+
 # for some reason occasionally the wrong type of DateTime shows up. Bad.
 def to_pythonPATCH( self, value, state ):
     if value is None:
@@ -125,6 +129,22 @@ def markup_message( message ):
     
     return message
 
+class ContextInfoAdapter(object):
+    def __init__(self, context):
+        self.context = context
+
+    def context_info(self):
+        context = self.context
+        return {'id': context.getId(),
+                'title': context.title_or_id(),
+                'short_title': context.title_or_id()[:20],
+                'uri': context.absolute_url(1)}
+
+class ContextInfoView(BrowserView):
+    def context_info(self):
+        context_info = ContextInfoAdapter(self.context)
+        return context_info.context_info()
+
 class XWFChatView( BrowserView ):
     defaultBackoff = 14 # seconds
     backoffAfterMessage = 7 # seconds
@@ -172,6 +192,11 @@ class XWFChatView( BrowserView ):
     
     def cb_chat( self, backoff=None, skip_user_update=False, skip_messages=False ):
         rdict = self._get_request_dict()
+        
+        last_timestamp = rdict['last_timestamp']
+        if last_timestamp in ( 'null', '' ):
+            last_timestamp = str( DateTime()-( self.maximumMessageAge/86400.0 ) )
+            
         now_dt = datetime.datetime.now()
         
         if not skip_user_update:
@@ -203,16 +228,11 @@ class XWFChatView( BrowserView ):
                 
             ulist.append( udict )
         
-        last_timestamp = rdict['last_timestamp']
-        if last_timestamp in ( 'null', '' ):
-            last_timestamp = str( DateTime()-( self.maximumMessageAge/86400.0 ) )
-        
-        writer = JSONWriter()
-        
         clause = ( sqlbuilder.AND( ChatMessage.q.group_id == rdict['group_id'], 
                                    ChatMessage.q.timestamp > last_timestamp ) )
         
         messages = ChatMessage.select( clause, orderBy=ChatMessage.q.timestamp )
+        
         # backoff is converted to milliseconds
         out = {'messages': [], 'users': ulist, 'past_users': olist,
                'backoff': ( backoff or self.defaultBackoff )*1000.0}
@@ -230,7 +250,9 @@ class XWFChatView( BrowserView ):
                 # an extra paranoid double check
                 if msg['checksum'] != rdict['last_checksum']:
                     out['messages'].append( msg )
-            
+        
+        writer = JSONWriter()
+        
         return writer.write( out )
 
     def submit_message( self ):
@@ -252,12 +274,18 @@ class XWFChatView( BrowserView ):
             chat_user = self._get_chat_user()
             chat_user.set( last_message=now_dt, last_seen=now_dt )
         
-            ChatMessage( group_id=rdict['group_id'], 
-                        user_id=rdict['user_id'], 
-                        message=rdict['message'] )
+            # we were encountering a race condition when two messages were hitting the database
+            # at the same instance, which happened more frequently than one would think!
+            try:
+                _thread_lock.acquire()
+                ChatMessage( group_id=rdict['group_id'], 
+                             user_id=rdict['user_id'], 
+                             message=rdict['message'] )
         
-            messages = self.cb_chat( backoff=self.backoffAfterMessage,
-                                     skip_user_update=True )
+                messages = self.cb_chat( backoff=self.backoffAfterMessage,
+                                         skip_user_update=True )
+            finally:
+                _thread_lock.release()
         
         return messages
 

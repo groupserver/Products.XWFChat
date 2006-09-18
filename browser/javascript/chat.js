@@ -17,6 +17,7 @@ function cb_timeout() {
 function populate_after_submit( type, data, event, kwArgs ){
     form = document.getElementById('chat_form');
     form['message'].value = '';
+    form['message'].focus();
     form['submit'].value = 'send';
     form['submit'].disabled = false;
     populate_messages( type, data, event, kwArgs );
@@ -165,7 +166,8 @@ function chatForm() {
     if (currentTimeoutId) {
        window.clearTimeout(currentTimeoutId);
     }
-  	form['submit'].disable = true;
+    form['message'].blur();
+  	form['submit'].disabled = true;
   	form['submit'].value = 'sending...';
   	return true;
   };
