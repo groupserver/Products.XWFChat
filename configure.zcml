@@ -27,13 +27,13 @@
 		class=".chat.XWFChatView" name="chat.html"
 		template="browser/templates/chat_with_template.pt"
 		permission="zope2.View" />
-		
+
 	<!-- setup our Database connectivity -->
 	<sqlos:connectionName name='ogs' />
 
 	<rdb:provideConnection name='ogs'
 		component='psycopgda.adapter.PsycopgAdapter'
-		dsn='dbi://onlinegroups.net:ogs.net@localhost:5432/onlinegroups.net' />
+		dsn='dbi://richard:foo@localhost:5432/onlinegroups.net' />
 
 	<adapter provides="sqlos.interfaces.IZopeSQLConnection"
 		for="zope.app.rdb.interfaces.IZopeConnection" permission="zope.Public"
@@ -53,8 +53,10 @@
 	<browser:resourceDirectory name="icons"
 		directory="browser/icons" permission="zope2.View" />
 
-	<browser:resourceDirectory name="dojo"
-		directory="browser/javascript/dojo/" permission="zope2.View" />
+        <!-- Moved to GSContent -->
+
+	<!-- <browser:resourceDirectory name="dojo"
+		directory="browser/javascript/dojo/" permission="zope2.View" /> -->
 
 	<browser:resource name="chat.css"
 		file="browser/stylesheets/chat.css" permission="zope2.View" />
@@ -65,8 +67,7 @@
 		type="zope.app.content.interfaces.IContentType" />
 	<interface interface=".interfaces.IGSChat"
 		type="zope.app.content.interfaces.IContentType" />
-
-
+	
 	<browser:page for="*" template="browser/skin/gs_template.pt"
 		name="gs_template" permission="zope.Public" />
 
