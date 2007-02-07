@@ -13,7 +13,8 @@
             baseScriptUri:'/++resource++dojo/'
         };
     </script>
-    <script language="JavaScript" type="text/javascript" src="/++resource++dojo/dojo.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/++resource++date/DP_DateExtensions.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/++resource++prototype/prototype.js"></script>
     <script language="JavaScript" type="text/javascript" src="/++resource++chat.js"></script>
 
   </head> 
