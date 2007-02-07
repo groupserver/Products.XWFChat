@@ -1,9 +1,5 @@
-dojo.require("dojo.date");
-dojo.require("dojo.widget.Tooltip");
-
 lastTimestamp = null;
 lastChecksum = null;
-dojoCurrentRequest = null;
 currentTimeoutId = null;
 maxChatMessages = 50;
 callbackBackoff = 10000;
@@ -14,13 +10,14 @@ function cb_timeout() {
     chatBind();
 };
 
-function populate_after_submit( type, data, event, kwArgs ){
+function populate_after_submit( transport ){
     form = document.getElementById('chat_form');
     form['message'].value = '';
     form['message'].focus();
     form['submit'].value = 'send';
     form['submit'].disabled = false;
-    populate_messages( type, data, event, kwArgs );
+    data = eval(transport.responseText);
+    populate_messages( data );
     // And reset
     resetBind();
 };
@@ -40,22 +37,11 @@ function populate_user_list( user_container_object, data ) {
        userContainer.appendChild(userDiv);
        user_container_object.appendChild(userContainer);
        
-       tooltip = dojo.widget.createWidget("Tooltip", { connectId: userDiv.id,
-                                                       toggle: "fade",
-                                                       templateCssString: "",
-                                                       templateCssPath: "",
-                                                       hideDelay: 0.75,
-                                                       showDelay: 0 });
-       
-       timestamp = dojo.date.fromIso8601(data[x]['last_message']);
-       tooltip.setContent('<b>user</b>: '+data[x]['user_realname']+'<br/><b>last message:</b> '+timestamp);
+       timestamp = Date.parseIso8601(data[x]['last_message']);
     }
-  
-
 };
 
-function populate_messages( type, data, event, kwArgs ) {
-    
+function populate_messages( data ) {
     chatMessages = document.getElementById('chatmessages');
     chatUsers = document.getElementById('chatusers');
     chatPastUsers = document.getElementById('chatpastusers');
@@ -68,8 +54,6 @@ function populate_messages( type, data, event, kwArgs ) {
     users = data['users'];
     pastusers = data['past_users'];
     
-	dojo.debug("Retrieved data, length is "+data['messages'].length);
-	dojo.debug("Backoff set to", data['backoff']);
     for (var x = 0; x < messages.length; x++)
     {
        msgContainer = document.createElement("div");
@@ -88,7 +72,7 @@ function populate_messages( type, data, event, kwArgs ) {
        userDiv.innerHTML = messages[x]['user_realname']
        userDiv.className = 'userid';
        timeDiv = document.createElement("div");
-       timestamp = dojo.date.fromIso8601(messages[x]['timestamp'])
+       timestamp = Date.parseIso8601(messages[x]['timestamp'])
        timeDiv.innerHTML = '('+timestamp+')'
        timeDiv.className = 'timestamp';
        
@@ -118,60 +102,94 @@ function populate_messages( type, data, event, kwArgs ) {
 };
 
 function resetBind() {
+    if (isCallInProgress()) {
+        callInProgress.transport.abort();
+        callInProgress = null;
+    };
     delay = callbackBackoff;   
-    currentTimeoutId = window.setTimeout( "cb_timeout()", delay /* milliseconds */);    
+    currentTimeoutId = window.setTimeout( "cb_timeout()", delay /* milliseconds */);
 };
 
-function cb_chat( type, data, event, kwArgs ) {
-    populate_messages( type, data, event, kwArgs);
+function cb_chat( transport, json ) {
+    data = eval(transport.responseText);
+    populate_messages( data );
     resetBind();
 };
 
-function onErrorHandler( type, data, event, kwArgs ) {
+function onErrorHandler( transport, json ) {
     resetBind();
+};
+
+callInProgress = null;
+
+function isCallInProgress ( ) {
+        if (callInProgress == null ) {
+            return false;
+        };
+
+        switch (callInProgress.transport.readyState) {
+            case 1: case 2: case 3:
+                return true;
+                break;
+            default:
+                return false;
+                break;               
+        };
 };
 
 function chatBind () {
     form = document.getElementById('chat_form');
     groupID = form['group_id'].value;
     userID = form['user_id'].value;
-    dojoCurrentRequest = dojo.io.bind({
-    	url: "cb_chat",
-	load: cb_chat,
-    	mimetype: "text/json",
-    	encoding: "utf-8",
-    	content: {'group_id': groupID, 'user_id': userID, 'last_timestamp': lastTimestamp, 'last_checksum': lastChecksum},
-	error: onErrorHandler,
-	timeout: onErrorHandler,
-	timeoutSeconds: timeout, //The number of seconds to wait until firing timeout callback in case of timeout.
-    	preventCache: true
-    }); 
+    if (isCallInProgress()) {
+        callInProgress.transport.abort();
+        callInProgress = null;
+    };
+
+    callInProgress = new Ajax.Request('cb_chat', 
+       {parameters: {'group_id': groupID,
+                     'user_id': userID,
+                     'last_timestamp': lastTimestamp,
+                     'last_checksum': lastChecksum},
+        onSuccess: cb_chat,
+        onFailure: onErrorHandler,
+        onComplete: function(transport, json) { callInProgress = null; },
+       }
+    );
 }
 
-function chatForm() {
-  var x = new dojo.io.FormBind({
-  formNode: document.getElementById('chat_form'),
-  mimetype: 'text/json',
-  encoding: "utf-8",
-  load: populate_after_submit,
-  error: onErrorHandler,
-  timeout: onErrorHandler,
-  timeoutSeconds: timeout
-  });
-  x.onSubmit = function (form) {
-    // Make sure we don't double up on requests
-    if (dojoCurrentRequest) {
-       dojoCurrentRequest.abort();
-    }
+function chatSubmit ( event ) {
+    // stop the form getting submitted
+    Event.stop(event);
+    
+    if (isCallInProgress()) {
+        callInProgress.transport.abort();
+        callInProgress = null;
+    };
+    
     if (currentTimeoutId) {
        window.clearTimeout(currentTimeoutId);
     }
+    
+    form = $('chat_form');
     form['message'].blur();
-  	form['submit'].disabled = true;
-  	form['submit'].value = 'sending...';
-  	return true;
-  };
+    form['submit'].disabled;
+    form['submit'].value = 'sending...';
+    
+    callInProgress = new Ajax.Request('submit_message', 
+       {parameters: form.serialize(true),
+        onSuccess: populate_after_submit,
+        onFailure: onErrorHandler,
+        onComplete: function(transport, json) { callInProgress = null; },
+       }
+    );
+    
+    return false;
+};
+  
+function chatForm() {
+  Event.observe($('chat_form'), 'submit', chatSubmit);
 }
 
-dojo.addOnLoad(chatForm);
-dojo.addOnLoad(chatBind);
+Event.observe(window, 'load', chatForm);
+Event.observe(window, 'load', chatBind);
