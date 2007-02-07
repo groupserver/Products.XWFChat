@@ -215,8 +215,14 @@ class XWFChatView( BrowserView ):
             
             udict['user_id'] = user.user_id
             udict['user_realname'] = self._get_chat_user_realname( user.user_id )
-            udict['joined'] = str( user.joined )
-            udict['last_message'] = str( user.last_message )
+            try:
+                udict['joined'] = user.joined.isoformat('T')[:-3]
+            except:
+                udict['joined'] = ''
+            try:
+                udict['last_message'] = user.last_message.isoformat('T')[:-3]
+            except:
+                udict['last_message'] = ''
                     
             last_seen = user.last_seen
             if last_seen:
@@ -242,7 +248,7 @@ class XWFChatView( BrowserView ):
                 
                 msg['user_id'] = message.user_id
                 msg['user_realname'] = self._get_chat_user_realname( message.user_id )
-                msg['timestamp'] = message.timestamp.isoformat()
+                msg['timestamp'] = message.timestamp.isoformat('T')[:-3]
                 msg['message'] = markup_message( message.message )
                 
                 msg['checksum'] = md5.new(rdict['group_id']+msg['user_id']+msg['message']).hexdigest()
@@ -250,10 +256,12 @@ class XWFChatView( BrowserView ):
                 # an extra paranoid double check
                 if msg['checksum'] != rdict['last_checksum']:
                     out['messages'].append( msg )
+
+        self.request.response.setHeader('content-type', 'application/x-javascript')
         
         writer = JSONWriter()
         
-        return writer.write( out )
+        return '('+writer.write( out )+')'
 
     def submit_message( self ):
         rdict = self._get_request_dict()
