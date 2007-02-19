@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      metal:use-macro="context/@@gs_template/page">
+      metal:use-macro="context/@@groupserver_layout/page">
 	<head>
     <title metal:fill-slot="title" tal:content="view/title | nothing">The title</title>
     <tal:block metal:fill-slot="javascript">
