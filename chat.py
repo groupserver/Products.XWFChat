@@ -28,7 +28,8 @@ import time
 import md5
 
 import ThreadLock
- 
+import Products.GSContent 
+
 _thread_lock = ThreadLock.allocate_lock()
 
 # for some reason occasionally the wrong type of DateTime shows up. Bad.
@@ -145,6 +146,15 @@ class ContextInfoView(BrowserView):
         context_info = ContextInfoAdapter(self.context)
         return context_info.context_info()
 
+def pruneIsoTime( isotime ):
+    isobits = isotime.split('.')
+    if len(isobits) == 2:
+        ms = isobits[1]
+        if len(ms) > 3:
+            isotime = '%s.%s' % (isobits[0], isobits[1][:3])
+
+    return isotime
+
 class XWFChatView( BrowserView ):
     defaultBackoff = 14 # seconds
     backoffAfterMessage = 7 # seconds
@@ -153,6 +163,11 @@ class XWFChatView( BrowserView ):
     pastUsersTimeLimit = 86400*3 # 3 days
     maximumMessageAge = 3600*6 # 6 hours
         
+    def __init__( self, context, request ):
+        self.context = context
+        self.request = request
+        self.siteInfo = Products.GSContent.view.GSSiteInfo( context )
+
     def title( self ):
         return 'Group Chat'
     
@@ -216,11 +231,11 @@ class XWFChatView( BrowserView ):
             udict['user_id'] = user.user_id
             udict['user_realname'] = self._get_chat_user_realname( user.user_id )
             try:
-                udict['joined'] = user.joined.isoformat('T')[:-3]
+                udict['joined'] = pruneIsoTime(user.joined.isoformat('T'))
             except:
                 udict['joined'] = ''
             try:
-                udict['last_message'] = user.last_message.isoformat('T')[:-3]
+                udict['last_message'] = pruneIsoTime(user.last_message.isoformat('T'))
             except:
                 udict['last_message'] = ''
                     
@@ -248,7 +263,7 @@ class XWFChatView( BrowserView ):
                 
                 msg['user_id'] = message.user_id
                 msg['user_realname'] = self._get_chat_user_realname( message.user_id )
-                msg['timestamp'] = message.timestamp.isoformat('T')[:-3]
+                msg['timestamp'] = pruneIsoTime(message.timestamp.isoformat('T'))
                 msg['message'] = markup_message( message.message )
                 
                 msg['checksum'] = md5.new(rdict['group_id']+msg['user_id']+msg['message']).hexdigest()

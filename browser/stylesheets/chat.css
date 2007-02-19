@@ -70,6 +70,8 @@ form {
 
 input.chatinput {
 	width: 503px;
+        margin: 0px;
+        float: left;
 	font-size: 13px;
 	border: solid 1px black;
 	padding: 5px;
@@ -77,6 +79,7 @@ input.chatinput {
 
 input.chatsubmit {
 	border: solid 1px black;
+        margin: 0 0 0 5px;
 	background-color: #F8F8FF;
 	padding: 4px;
 }

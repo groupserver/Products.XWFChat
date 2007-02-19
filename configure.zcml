@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configure xmlns="http://namespaces.zope.org/zope"
 	xmlns:browser="http://namespaces.zope.org/browser"
 	xmlns:rdb="http://namespaces.zope.org/rdb"
@@ -12,9 +11,70 @@
 
 	<!-- make it known to Five -->
 	<five:traversable class="OFS.Folder.Folder" />
-  
+
+	<browser:page for="*" class=".chat.XWFChatView"
+		name="hello.html" template="browser/templates/standard_template.pt"
+		permission="zope2.View" />
+
+	<browser:page for="zope.app.folder.interfaces.IFolder"
+		class=".chat.XWFChatView" attribute="cb_chat" name="cb_chat"
+		permission="zope2.View" />
+	<browser:page for="zope.app.folder.interfaces.IFolder"
+		class=".chat.XWFChatView" attribute="submit_message"
+		name="submit_message" permission="zope2.View" />
+
+	<browser:page for=".interfaces.IGSChat"
+		class=".chat.XWFChatView" name="chat.html"
+		template="browser/templates/chat_with_template.pt"
+		permission="zope2.View" />
+
+	<!-- setup our Database connectivity -->
+	<sqlos:connectionName name='ogs' />
+
+	<rdb:provideConnection name='ogs'
+		component='psycopgda.adapter.PsycopgAdapter'
+		dsn='dbi://richard:foo@localhost:5432/onlinegroups.net' />
+
+	<adapter provides="sqlos.interfaces.IZopeSQLConnection"
+		for="zope.app.rdb.interfaces.IZopeConnection" permission="zope.Public"
+		factory="sqlos.adapter.PostgresAdapter" />
+
+	<!-- We try to create the tables at db open time -->
+	<subscriber handler=".chat.createTablesSubscriber"
+		for="zope.app.appsetup.interfaces.IDatabaseOpenedEvent" />
+
+	<browser:addMenuItem class="OFS.Folder.Folder" title="Blarg Folder"
+		description="Blarg Folder Description"
+		permission="zope.ManageContent" />
+
+	<browser:resourceDirectory name="smileys"
+		directory="browser/icons/smileys/default" permission="zope2.View" />
+		
+	<browser:resourceDirectory name="icons"
+		directory="browser/icons" permission="zope2.View" />
+
+        <!-- Moved to GSContent -->
+
+	<!-- <browser:resourceDirectory name="dojo"
+		directory="browser/javascript/dojo/" permission="zope2.View" /> -->
+
+	<browser:resource name="chat.css"
+		file="browser/stylesheets/chat.css" permission="zope2.View" />
+	<browser:resource name="chat.js"
+		file="browser/javascript/chat.js" permission="zope2.View" />
+
 	<interface interface=".interfaces.IGSGroupFolder"
 		type="zope.app.content.interfaces.IContentType" />
 	<interface interface=".interfaces.IGSChat"
 		type="zope.app.content.interfaces.IContentType" />
+	
+	<browser:page for="*" template="browser/skin/gs_template.pt"
+		name="gs_template" permission="zope.Public" />
+
+	<browser:layer name="tofu" />
+	<browser:skin name="Groupserver" layers="tofu default" />
+
+	<browser:page for="*" template="browser/skin/tofu_template.pt"
+		name="gs_template" layer="tofu" permission="zope.Public" />
+
 </configure>
