@@ -70,6 +70,8 @@
 
 form {
 	clear: both;
+	position: absolute;
+	top: 600px;
 }
 
 input.chatinput {
