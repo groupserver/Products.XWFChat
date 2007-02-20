@@ -6,10 +6,6 @@
 	float: left;
 	margin: 0 0 10px 0;
 	padding: 0px;
-	
-	position: relative;
-	top: -500px;
-	left: 510px;
 }
 
 #chatmessages {
@@ -39,6 +35,10 @@
 	height: 490px;
 	width: 150px;
 	font-size: 11px;
+	
+	position: relative;
+	top: -500px;
+	left: 510px;
 }
 
 #chatusers {
