@@ -45,16 +45,13 @@ function populate_messages( data ) {
     chatMessages = document.getElementById('chatmessages');
     chatUsers = document.getElementById('chatusers');
     chatPastUsers = document.getElementById('chatpastusers');
-    
     form = document.getElementById('chat_form');
-    
     callbackBackoff = data['backoff'];
-    
-    messages = data['messages'];
+    mess = data['messages'];
     users = data['users'];
     pastusers = data['past_users'];
-    
-    for (var x = 0; x < messages.length; x++)
+
+    for (var x = 0; x < mess.length; x++)
     {
        msgContainer = document.createElement("div");
        
@@ -66,13 +63,13 @@ function populate_messages( data ) {
        oddRow = !oddRow;
        
        msgDiv = document.createElement("div");
-       msgDiv.innerHTML = messages[x]['message']
+       msgDiv.innerHTML = mess[x]['message']
        msgDiv.className = 'message';
        userDiv = document.createElement("div");
-       userDiv.innerHTML = messages[x]['user_realname']
+       userDiv.innerHTML = mess[x]['user_realname']
        userDiv.className = 'userid';
        timeDiv = document.createElement("div");
-       timestamp = Date.parseIso8601(messages[x]['timestamp'])
+       timestamp = Date.parseIso8601(mess[x]['timestamp'])
        timeDiv.innerHTML = '('+timestamp+')'
        timeDiv.className = 'timestamp';
        
@@ -88,10 +85,10 @@ function populate_messages( data ) {
         chatMessages.appendChild(msgContainer);;
        };
     
-       lastTimestamp = messages[x]['timestamp']; 
+       lastTimestamp = mess[x]['timestamp']; 
        form['last_timestamp'].value = lastTimestamp;
        
-       lastChecksum = messages[x]['checksum']; 
+       lastChecksum = mess[x]['checksum']; 
        form['last_checksum'].value = lastChecksum;
        
        chatMessages.scrollTop = chatMessages.scrollHeight-chatMessages.clientHeight;
