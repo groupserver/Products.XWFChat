@@ -153,7 +153,7 @@ function chatBind () {
                      'last_checksum': lastChecksum},
         onSuccess: cb_chat,
         onFailure: onErrorHandler,
-        onComplete: function(transport, json) { callInProgress = null; },
+        onComplete: function(transport, json) { callInProgress = null; }
        }
     );
 }
@@ -180,7 +180,7 @@ function chatSubmit ( event ) {
        {parameters: form.serialize(true),
         onSuccess: populate_after_submit,
         onFailure: onErrorHandler,
-        onComplete: function(transport, json) { callInProgress = null; },
+        onComplete: function(transport, json) { callInProgress = null; }
        }
     );
     
