@@ -35,10 +35,6 @@
 	height: 490px;
 	width: 150px;
 	font-size: 11px;
-	
-	position: relative;
-	top: -500px;
-	left: 510px;
 }
 
 #chatusers {
@@ -70,14 +66,10 @@
 
 form {
 	clear: both;
-	position: absolute;
-	top: 600px;
 }
 
 input.chatinput {
 	width: 503px;
-        margin: 0px;
-        float: left;
 	font-size: 13px;
 	border: solid 1px black;
 	padding: 5px;
@@ -85,10 +77,8 @@ input.chatinput {
 
 input.chatsubmit {
 	border: solid 1px black;
-        margin: 0 0 0 5px;
 	background-color: #F8F8FF;
 	padding: 4px;
-	width: 150px;
 }
 
 .dojoTooltip {
