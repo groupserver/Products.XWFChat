@@ -1,17 +1,11 @@
 #chatmessagespane {
-	border: 1px solid #000000;
-	height: 500px;
-	width: 500px;
-	font-size: 11px;
-	float: left;
-	margin: 0 0 10px 0;
-	padding: 0px;
 }
 
 #chatmessages {
+  border: 1px solid black;
 	height: 500px;
 	width: 500px;
-	overflow: auto;
+	float: left;
 }
 
 .chatmessagerowodd {
@@ -27,14 +21,10 @@
 }
 
 #chatuserspane {
-	padding: 5px;
-	margin: 0 0 10px 5px;
+	padding: 0px 0px 0px 510px;
 	border: 1px solid #000000;
-	background-color: #ffffff;
-	overflow: auto;
-	height: 490px;
+	height: 500px;
 	width: 150px;
-	font-size: 11px;
 }
 
 #chatusers {
@@ -55,12 +45,10 @@
 	color: #5C791C;
 	float: left;
 	margin: 0 5px 0 0;
-	font-size: 10px;
 }
 
 .timestamp {
 	color: #5C791C;
-	font-size: 10px;
 	clear: right;
 }
 
@@ -70,19 +58,14 @@ form {
 
 input.chatinput {
 	width: 503px;
-	font-size: 13px;
-	border: solid 1px black;
 	padding: 5px;
 }
 
 input.chatsubmit {
-	border: solid 1px black;
-	background-color: #F8F8FF;
 	padding: 4px;
 }
 
 .dojoTooltip {
-	font-size: 12px;
 	padding: 5px;
 	background-color: #EFF0ED;
 	border: solid 1px #5C791C;
