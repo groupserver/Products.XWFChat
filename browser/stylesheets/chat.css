@@ -82,3 +82,7 @@ input.chatsubmit {
 	background-color: #EFF0ED;
 	border: solid 1px #5C791C;
 }
+
+#footerlinks {
+  visibility: none;
+}
