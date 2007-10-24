@@ -13,10 +13,15 @@ function cb_timeout() {
 function populate_after_submit( transport ){
     //form = document.getElementById('chat_form');
     form = jQuery("#chat_form");
-    form['message'].value = '';
-    form['message'].focus();
-    form['submit'].value = 'send';
-    form['submit'].disabled = false;
+    //form['message'].value = '';
+    //form['message'].focus();
+    jQuery('#message').val('').focus();
+    
+    //form['submit'].value = 'send';
+    jQuery('#submit').val('send');
+    //form['submit'].disabled = false;
+    jQuery('#submit').attr('disabled','');
+    
     data = eval(transport.responseText);
     populate_messages( data );
     // And reset
@@ -56,6 +61,11 @@ function populate_messages( data ) {
     //chatPastUsers = document.getElementById('chatpastusers');
     chatPastUsers = jQuery('#chatpastusers');
     //form = document.getElementById('chat_form');
+
+    if (!data) {
+      return;
+    }
+
     form = jQuery('#chat_form');
     callbackBackoff = data['backoff'];
     mess = data['messages'];
@@ -163,8 +173,10 @@ function isCallInProgress ( ) {
 function chatBind () {
     //form = document.getElementById('chat_form');
     form = jQuery('#chat_form');
-    groupID = form['group_id'].value;
-    userID = form['user_id'].value;
+    //groupID = form['group_id'].value;
+    groupID = form.children('group_id').value;
+    //userID = form['user_id'].value;
+    userID = form.children('user_id').value
     if (isCallInProgress()) {
         callInProgress.transport.abort();
         callInProgress = null;
@@ -211,9 +223,12 @@ function chatSubmit ( event ) {
     
     //form = $('chat_form');
     form = jQuery('#chat_form');
-    form['message'].blur();
-    form['submit'].disabled;
-    form['submit'].value = 'sending...';
+    //form['message'].blur();
+    jQuery('#message').blur();
+    //form['submit'].disabled;
+    jQuery('#submit').attr("disabled","disabled");
+    jQuery('#submit').val('Sending\u2026');
+    //form['submit'].value = 'sending...';
     
     /*
     callInProgress = new Ajax.Request('submit_message', 

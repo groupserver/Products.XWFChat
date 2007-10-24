@@ -31,8 +31,8 @@
           <input type="hidden" name="last_checksum" value="" />
           <input tal:condition="request/form/user_id | nothing" type="hidden" name="user_id" tal:attributes="value request/form/user_id" />
           <input type="hidden" name="group_id" tal:attributes="value python:request.get('group_id', 'default')" />
-          <input class="chatinput" name="message" value="" />
-          <input class="chatsubmit" type="submit" name="submit" value="send" />
+          <input class="chatinput" name="message" id="message" value="" />
+          <input class="chatsubmit" type="submit" id="submit" name="submit" value="send" />
       </form>
 
 
