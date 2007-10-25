@@ -26,11 +26,16 @@
           
        </div>
       <form id="chat_form" method="POST" action="submit_message" ACCEPT_CHARSET="UTF-8">
-          <input type="hidden" name="_charset_" />
-          <input type="hidden" name="last_timestamp" value="" />
-          <input type="hidden" name="last_checksum" value="" />
-          <input tal:condition="request/form/user_id | nothing" type="hidden" name="user_id" tal:attributes="value request/form/user_id" />
-          <input type="hidden" name="group_id" tal:attributes="value python:request.get('group_id', 'default')" />
+          <input type="hidden" name="_charset_" id="_charset_" />
+          <input type="hidden" name="last_timestamp" id="last_timesatamp"
+            value="" />
+          <input type="hidden" name="last_checksum" id="last_checksum" 
+            value="" />
+          <input tal:condition="request/form/user_id | nothing" 
+            type="hidden" name="user_id" 
+            tal:attributes="value request/form/user_id" />
+          <input type="hidden" name="group_id" 
+            tal:attributes="value python:request.get('group_id', 'default')" />
           <input class="chatinput" name="message" id="message" value="" />
           <input class="chatsubmit" type="submit" id="submit" name="submit" value="send" />
       </form>

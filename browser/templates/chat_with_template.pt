@@ -39,14 +39,21 @@
           <div id="chatpastusers">Loading...</div>
           
        </div>
-      <form id="chat_form" method="POST" action="submit_message" ACCEPT_CHARSET="UTF-8">
-          <input type="hidden" name="_charset_" />
-          <input type="hidden" name="last_timestamp" value="" />
-          <input type="hidden" name="last_checksum" value="" />
-          <input tal:condition="user/getId | request/form/user_id | nothing" type="hidden" name="user_id" tal:attributes="value user/getId | request/form/user_id" />
-          <input type="hidden" name="group_id" tal:attributes="value python:context.Scripts.get.group_object().getId()" />
-          <input class="chatinput" name="message" id="message" value="" />
-          <input class="chatsubmit" type="submit" id="submit" name="submit" value="send" />
+      <form id="chat_form" method="POST" action="submit_message"
+        ACCEPT_CHARSET="UTF-8">
+        <input type="hidden" name="_charset_" id="_charset_" />
+        <input type="hidden" name="last_timestamp" id="last_timesatamp"
+          value="" />
+        <input type="hidden" name="last_checksum" id="last_checksum" 
+          value="" />
+        <input  type="hidden" name="user_id" id="user_id" 
+          tal:condition="user/getId | request/form/user_id | nothing"
+          tal:attributes="value user/getId | request/form/user_id" />
+        <input type="hidden" name="group_id" id="group_id"
+          tal:attributes="value python:context.Scripts.get.group_object().getId()" />
+        <input class="chatinput" name="message" id="message" value="" />
+        <input class="chatsubmit" type="submit" id="submit" 
+          name="submit" value="send" />
       </form>
 
     <div id="dojoDebugOutput"></div>

@@ -12,7 +12,7 @@ function cb_timeout() {
 
 function populate_after_submit( transport ){
     //form = document.getElementById('chat_form');
-    form = jQuery("#chat_form");
+    var form = jQuery("#chat_form");
     //form['message'].value = '';
     //form['message'].focus();
     jQuery('#message').val('').focus();
@@ -22,7 +22,8 @@ function populate_after_submit( transport ){
     //form['submit'].disabled = false;
     jQuery('#submit').attr('disabled','');
     
-    data = eval(transport.responseText);
+    //data = eval(transport.responseText);
+    var data = eval(transport);
     populate_messages( data );
     // And reset
     resetBind();
@@ -33,12 +34,12 @@ function populate_user_list( user_container_object, data ) {
     for (var x = 0; x < data.length; x++)
     {
        //userContainer = document.createElement("div");
-       userContainer = jQuery(user_container_object).append("<div/>");
+       userContainer = jQuery(user_container_object).append("<div/>").children(':last-child');
        //userContainer.className = 'chatusercontainer';
        userContainer.addClass('chatusercontainer');
        
        //userDiv = document.createElement("div");
-       userDiv = userContainer.append("<div/>");
+       userDiv = userContainer.append("<div/>").children(':last-child');
        //userDiv.id = 'chatuserid_'+data[x]['user_id'];
        userDiv.attr('id', 'chatuserid_' + data[x]['user_id']);
        //userDiv.innerHTML = data[x]['user_realname'];
@@ -54,28 +55,35 @@ function populate_user_list( user_container_object, data ) {
 };
 
 function populate_messages( data ) {
-    //chatMessages = document.getElementById('chatmessages');
-    chatMessages = jQuery('#chatmessages');
-    //chatUsers = document.getElementById('chatusers');
-    chatUsers = jQuery('#chatusers');
-    //chatPastUsers = document.getElementById('chatpastusers');
-    chatPastUsers = jQuery('#chatpastusers');
-    //form = document.getElementById('chat_form');
-
     if (!data) {
       return;
     }
 
-    form = jQuery('#chat_form');
-    callbackBackoff = data['backoff'];
-    mess = data['messages'];
-    users = data['users'];
-    pastusers = data['past_users'];
+    //chatMessages = document.getElementById('chatmessages');
+    var chatMessages = jQuery('#chatmessages');
+    //chatUsers = document.getElementById('chatusers');
+    var chatUsers = jQuery('#chatusers');
+    //chatPastUsers = document.getElementById('chatpastusers');
+    var chatPastUsers = jQuery('#chatpastusers');
+    //form = document.getElementById('chat_form');
 
+    var form = jQuery('#chat_form');
+    var callbackBackoff = data['backoff'];
+    var mess = data['messages'];
+    var users = data['users'];
+    var pastusers = data['past_users'];
+
+    var timeDiv = null;
+    var timestamp = null;
+    var msgDiv = null;
+    var msgContainer = null;
+    var chatMessageLength = null;
+    var oddRow = false;
+    
     for (var x = 0; x < mess.length; x++)
     {
        //msgContainer = document.createElement("div");
-       msgContainer = chatMessages.append('<div/>');
+       msgContainer = chatMessages.append('<div/>').children(':last-child');
        
        //Toggle between odd and even.
        if (oddRow) {
@@ -88,14 +96,14 @@ function populate_messages( data ) {
        oddRow = !oddRow;
        
        //userDiv = document.createElement("div");
-       userDiv = msgContainer.append('<div/>');
+       userDiv = msgContainer.append('<div/>').children(':last-child');
        //userDiv.innerHTML = mess[x]['user_realname']
        userDiv.text(mess[x]['user_realname']);
        //userDiv.className = 'userid';
        userDiv.addClass('userid');
        
        //timeDiv = document.createElement("div");
-       timeDiv = msgContainer.append('<div/>');
+       timeDiv = msgContainer.append('<div/>').children(':last-child');
        timestamp = Date.parseIso8601(mess[x]['timestamp']);
        //timeDiv.innerHTML = '('+timestamp+')'
        timeDiv.text('('+timestamp+')');
@@ -103,7 +111,7 @@ function populate_messages( data ) {
        timeDiv.addClass('timestamp');
 
        //msgDiv = document.createElement("div");
-       msgDiv = msgContainer.append('<div/>');
+       msgDiv = msgContainer.append('<div/>').children(':last-child');
        //msgDiv.innerHTML = mess[x]['message']
        msgDiv.text(mess[x]['message']);
        //msgDiv.className = 'message';
@@ -113,7 +121,8 @@ function populate_messages( data ) {
        //msgContainer.appendChild(timeDiv);
        //msgContainer.appendChild(msgDiv);
        
-       chatMessageLength = chatMessages.childNodes.length;
+       //chatMessageLength = chatMessages.childNodes.length;
+       chatMessageLength = chatMessages.children().length;
        if (chatMessageLength >= maxChatMessages) {
            chatMessages.removeChild(chatMessages.childNodes[0]);
        //     chatMessages.appendChild(msgContainer);
@@ -122,10 +131,12 @@ function populate_messages( data ) {
        };
     
        lastTimestamp = mess[x]['timestamp']; 
-       form['last_timestamp'].value = lastTimestamp;
+       // form['last_timestamp'].value = lastTimestamp;
+       jQuery('#last_timestamp').val(lastTimestamp);
        
        lastChecksum = mess[x]['checksum']; 
-       form['last_checksum'].value = lastChecksum;
+       // form['last_checksum'].value = lastChecksum;
+       jQuery('#last_checksum').val(lastChecksum);
        
        chatMessages.scrollTop = chatMessages.scrollHeight-chatMessages.clientHeight;
     }
@@ -172,11 +183,11 @@ function isCallInProgress ( ) {
 
 function chatBind () {
     //form = document.getElementById('chat_form');
-    form = jQuery('#chat_form');
+    var form = jQuery('#chat_form');
     //groupID = form['group_id'].value;
-    groupID = form.children('group_id').value;
+    var groupID = form.children('group_id').value;
     //userID = form['user_id'].value;
-    userID = form.children('user_id').value
+    var userID = form.children('user_id').value
     if (isCallInProgress()) {
         callInProgress.transport.abort();
         callInProgress = null;
