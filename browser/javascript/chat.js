@@ -155,7 +155,7 @@ function resetBind() {
 };
 
 function cb_chat( transport, json ) {
-    data = eval(transport.responseText);
+    var data = eval(transport);
     populate_messages( data );
     resetBind();
 };
