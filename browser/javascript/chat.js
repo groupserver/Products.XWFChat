@@ -11,18 +11,9 @@ function cb_timeout() {
 };
 
 function populate_after_submit( transport ){
-    //form = document.getElementById('chat_form');
-    var form = jQuery("#chat_form");
-    //form['message'].value = '';
-    //form['message'].focus();
     jQuery('#message').val('').focus();
+    jQuery('#submit').val('send').attr('disabled','');
     
-    //form['submit'].value = 'send';
-    jQuery('#submit').val('send');
-    //form['submit'].disabled = false;
-    jQuery('#submit').attr('disabled','');
-    
-    //data = eval(transport.responseText);
     var data = eval(transport);
     populate_messages( data );
     // And reset
@@ -38,22 +29,13 @@ function populate_user_list( user_container_object, data ) {
        if (!(data[x]['user_id'] in seenIds)) {
            seenIds[data[x]['user_id']] = '';
            
-           //userContainer = document.createElement("div");
            userContainer = jQuery(user_container_object).append("<div/>").children(':last-child');
-           //userContainer.className = 'chatusercontainer';
            userContainer.addClass('chatusercontainer');
            
-           //userDiv = document.createElement("div");
            userDiv = userContainer.append("<div/>").children(':last-child');
-           //userDiv.id = 'chatuserid_'+data[x]['user_id'];
            userDiv.attr('id', 'chatuserid_' + data[x]['user_id']);
-           //userDiv.innerHTML = data[x]['user_realname'];
            userDiv.html(data[x]['user_realname']);
-           //userDiv.className = 'chatuserid';
            userDiv.addClass('chatuserid');
-           
-           //userContainer.appendChild(userDiv);
-           //user_container_object.appendChild(userContainer);
            
            timestamp = Date.parseIso8601(data[x]['last_message']);
         }
@@ -65,9 +47,7 @@ function populate_messages( data ) {
       return;
     }
 
-    //chatMessages = document.getElementById('chatmessages');
     var chatMessages = jQuery('#chatmessages');
-    //form = document.getElementById('chat_form');
     var form = jQuery('#chat_form');
     var callbackBackoff = data['backoff'];
     var mess = data['messages'];
@@ -83,72 +63,47 @@ function populate_messages( data ) {
     
     for (var x = 0; x < mess.length; x++)
     {
-       //msgContainer = document.createElement("div");
        msgContainer = chatMessages.append('<div/>').children(':last-child');
        
        //Toggle between odd and even.
        if (oddRow) {
-           //msgContainer.className = 'chatmessagerowodd';
            msgContainer.addClass('chatmessagerowodd');
        } else {
-           //msgContainer.className = 'chatmessageroweven';
            msgContainer.addClass('chatmessageroweven');
        }
        oddRow = !oddRow;
        
-       //userDiv = document.createElement("div");
        userDiv = msgContainer.append('<div/>').children(':last-child');
-       //userDiv.innerHTML = mess[x]['user_realname']
        userDiv.text(mess[x]['user_realname']);
-       //userDiv.className = 'userid';
        userDiv.addClass('userid');
        
-       //timeDiv = document.createElement("div");
        timeDiv = msgContainer.append('<div/>').children(':last-child');
        timestamp = Date.parseIso8601(mess[x]['timestamp']);
-       //timeDiv.innerHTML = '('+timestamp+')'
        timeDiv.text('('+timestamp+')');
-       //timeDiv.className = 'timestamp';
        timeDiv.addClass('timestamp');
 
-       //msgDiv = document.createElement("div");
        msgDiv = msgContainer.append('<div/>').children(':last-child');
-       //msgDiv.innerHTML = mess[x]['message']
        msgDiv.text(mess[x]['message']);
-       //msgDiv.className = 'message';
        msgDiv.addClass('message');
-       
-       //msgContainer.appendChild(userDiv);
-       //msgContainer.appendChild(timeDiv);
-       //msgContainer.appendChild(msgDiv);
        
        //chatMessageLength = chatMessages.childNodes.length;
        chatMessageLength = chatMessages.children().length;
        if (chatMessageLength >= maxChatMessages) {
            chatMessages.removeChild(chatMessages.childNodes[0]);
-       //     chatMessages.appendChild(msgContainer);
-       //} else {
-        //chatMessages.appendChild(msgContainer);;
        };
     
        lastTimestamp = mess[x]['timestamp']; 
-       // form['last_timestamp'].value = lastTimestamp;
        jQuery('#last_timestamp').val(lastTimestamp);
        
        lastChecksum = mess[x]['checksum']; 
-       // form['last_checksum'].value = lastChecksum;
        jQuery('#last_checksum').val(lastChecksum);
        
-       //chatMessages.scrollTop = chatMessages.scrollHeight-chatMessages.clientHeight;
-       dh = chatMessages.scrollHeight-chatMessages.clientHeight
        chatMessages.each(function(){this.scrollTop = this.scrollHeight});
 
     }
     
-    //chatUsers = document.getElementById('chatusers');
     var chatUsers = jQuery('#chatusers');
     populate_user_list(chatUsers, users);
-    //chatPastUsers = document.getElementById('chatpastusers');
     var chatPastUsers = jQuery('#chatpastusers');
     populate_user_list(chatPastUsers, pastusers);
 };
@@ -190,29 +145,14 @@ function isCallInProgress ( ) {
 };
 
 function chatBind () {
-    //form = document.getElementById('chat_form');
     var form = jQuery('#chat_form');
-    //groupID = form['group_id'].value;
     var groupID = jQuery('#group_id').val();
-    //userID = form['user_id'].value;
     var userID = jQuery('user_id').val();
     if (isCallInProgress()) {
         callInProgress.abort();
         callInProgress = null;
     };
 
-    /*
-    callInProgress = new Ajax.Request('cb_chat', 
-       {parameters: {'group_id': groupID,
-                     'user_id': userID,
-                     'last_timestamp': lastTimestamp,
-                     'last_checksum': lastChecksum},
-        onSuccess: cb_chat,
-        onFailure: onErrorHandler,
-        onComplete: function(transport, json) { callInProgress = null; }
-       }
-    );
-    */
     callInProgress = jQuery.ajax(
       {'url':     'cb_chat',
        'data':   {'group_id': groupID,
@@ -240,24 +180,11 @@ function chatSubmit ( event ) {
        window.clearTimeout(currentTimeoutId);
     }
     
-    //form = $('chat_form');
     form = jQuery('#chat_form');
-    //form['message'].blur();
     jQuery('#message').blur();
-    //form['submit'].disabled;
     jQuery('#submit').attr("disabled","disabled");
     jQuery('#submit').val('Sending\u2026');
-    //form['submit'].value = 'sending...';
-    
-    /*
-    callInProgress = new Ajax.Request('submit_message', 
-       {parameters: form.serialize(true),
-        onSuccess: populate_after_submit,
-        onFailure: onErrorHandler,
-        onComplete: function(transport, json) { callInProgress = null; }
-       }
-    );
-    */
+
     callInProgress = jQuery.ajax(
       {'url':      'submit_message',
        'data':     form.serialize(),
@@ -268,14 +195,11 @@ function chatSubmit ( event ) {
     
     return false;
 };
-  
+
 function chatForm() {
-  //Event.observe($('chat_form'), 'submit', chatSubmit);
   jQuery('#chat_form').submit(chatSubmit);
 }
 
-//Event.observe(window, 'load', chatForm);
-//Event.observe(window, 'load', chatBind);
 jQuery(document).ready( function () {
     chatForm();
     chatBind();
