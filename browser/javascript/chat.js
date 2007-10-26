@@ -30,27 +30,33 @@ function populate_after_submit( transport ){
 };
 
 function populate_user_list( user_container_object, data ) {
-    user_container_object.innerHTML = '';
+    user_container_object.empty();
+    var seenIds = {};
+    
     for (var x = 0; x < data.length; x++)
     {
-       //userContainer = document.createElement("div");
-       userContainer = jQuery(user_container_object).append("<div/>").children(':last-child');
-       //userContainer.className = 'chatusercontainer';
-       userContainer.addClass('chatusercontainer');
-       
-       //userDiv = document.createElement("div");
-       userDiv = userContainer.append("<div/>").children(':last-child');
-       //userDiv.id = 'chatuserid_'+data[x]['user_id'];
-       userDiv.attr('id', 'chatuserid_' + data[x]['user_id']);
-       //userDiv.innerHTML = data[x]['user_realname'];
-       userDiv.html(data[x]['user_realname']);
-       //userDiv.className = 'chatuserid';
-       userDiv.addClass('chatuserid');
-       
-       //userContainer.appendChild(userDiv);
-       //user_container_object.appendChild(userContainer);
-       
-       timestamp = Date.parseIso8601(data[x]['last_message']);
+       if (!(data[x]['user_id'] in seenIds)) {
+           seenIds[data[x]['user_id']] = '';
+           
+           //userContainer = document.createElement("div");
+           userContainer = jQuery(user_container_object).append("<div/>").children(':last-child');
+           //userContainer.className = 'chatusercontainer';
+           userContainer.addClass('chatusercontainer');
+           
+           //userDiv = document.createElement("div");
+           userDiv = userContainer.append("<div/>").children(':last-child');
+           //userDiv.id = 'chatuserid_'+data[x]['user_id'];
+           userDiv.attr('id', 'chatuserid_' + data[x]['user_id']);
+           //userDiv.innerHTML = data[x]['user_realname'];
+           userDiv.html(data[x]['user_realname']);
+           //userDiv.className = 'chatuserid';
+           userDiv.addClass('chatuserid');
+           
+           //userContainer.appendChild(userDiv);
+           //user_container_object.appendChild(userContainer);
+           
+           timestamp = Date.parseIso8601(data[x]['last_message']);
+        }
     }
 };
 
@@ -61,12 +67,7 @@ function populate_messages( data ) {
 
     //chatMessages = document.getElementById('chatmessages');
     var chatMessages = jQuery('#chatmessages');
-    //chatUsers = document.getElementById('chatusers');
-    var chatUsers = jQuery('#chatusers');
-    //chatPastUsers = document.getElementById('chatpastusers');
-    var chatPastUsers = jQuery('#chatpastusers');
     //form = document.getElementById('chat_form');
-
     var form = jQuery('#chat_form');
     var callbackBackoff = data['backoff'];
     var mess = data['messages'];
@@ -138,10 +139,17 @@ function populate_messages( data ) {
        // form['last_checksum'].value = lastChecksum;
        jQuery('#last_checksum').val(lastChecksum);
        
-       chatMessages.scrollTop = chatMessages.scrollHeight-chatMessages.clientHeight;
+       //chatMessages.scrollTop = chatMessages.scrollHeight-chatMessages.clientHeight;
+       dh = chatMessages.scrollHeight-chatMessages.clientHeight
+       chatMessages.each(function(){this.scrollTop = this.scrollHeight});
+
     }
     
+    //chatUsers = document.getElementById('chatusers');
+    var chatUsers = jQuery('#chatusers');
     populate_user_list(chatUsers, users);
+    //chatPastUsers = document.getElementById('chatpastusers');
+    var chatPastUsers = jQuery('#chatpastusers');
     populate_user_list(chatPastUsers, pastusers);
 };
 
