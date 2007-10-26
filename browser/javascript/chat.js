@@ -147,7 +147,7 @@ function populate_messages( data ) {
 
 function resetBind() {
     if (isCallInProgress()) {
-        callInProgress.transport.abort();
+        callInProgress.abort();
         callInProgress = null;
     };
     delay = callbackBackoff;   
@@ -171,7 +171,7 @@ function isCallInProgress ( ) {
             return false;
         };
 
-        switch (callInProgress.transport.readyState) {
+        switch (callInProgress.readyState) {
             case 1: case 2: case 3:
                 return true;
                 break;
@@ -185,11 +185,11 @@ function chatBind () {
     //form = document.getElementById('chat_form');
     var form = jQuery('#chat_form');
     //groupID = form['group_id'].value;
-    var groupID = form.children('group_id').value;
+    var groupID = jQuery('#group_id').val();
     //userID = form['user_id'].value;
-    var userID = form.children('user_id').value
+    var userID = jQuery('user_id').val();
     if (isCallInProgress()) {
-        callInProgress.transport.abort();
+        callInProgress.abort();
         callInProgress = null;
     };
 
@@ -205,7 +205,7 @@ function chatBind () {
        }
     );
     */
-    jQuery.ajax(
+    callInProgress = jQuery.ajax(
       {'url':     'cb_chat',
        'data':   {'group_id': groupID,
                   'user_id': userID,
@@ -224,7 +224,7 @@ function chatSubmit ( event ) {
     jQuery('#chat_form').unbind('submit') // No clean map
     
     if (isCallInProgress()) {
-        callInProgress.transport.abort();
+        callInProgress.abort();
         callInProgress = null;
     };
     
@@ -250,7 +250,7 @@ function chatSubmit ( event ) {
        }
     );
     */
-    jQuery.ajax(
+    callInProgress = jQuery.ajax(
       {'url':      'submit_message',
        'data':     form.serialize(),
        'success':  populate_after_submit,
