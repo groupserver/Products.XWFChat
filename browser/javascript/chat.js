@@ -16,7 +16,6 @@ function populate_after_submit( transport ){
     
     var data = eval(transport);
     populate_messages( data );
-    // And reset
     resetBind();
 };
 
@@ -61,8 +60,7 @@ function populate_messages( data ) {
     var chatMessageLength = null;
     var oddRow = false;
 
-    var foo = ( mess.length != 0 );
-    if ( foo ) {
+    if (  mess.length != 0 ) {
       chatMessages.empty();
     }
     
@@ -173,9 +171,6 @@ function chatBind () {
 
 function chatSubmit ( event ) {
     // stop the form getting submitted
-
-    //Event.stop(event);
-    //jQuery('#chat_form').unbind('submit') // No clean map
     
     if (isCallInProgress()) {
         callInProgress.abort();
