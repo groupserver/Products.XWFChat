@@ -60,8 +60,14 @@ function populate_messages( data ) {
     var msgContainer = null;
     var chatMessageLength = null;
     var oddRow = false;
+
+    var foo = ( mess.length != 0 );
+    if ( foo ) {
+      chatMessages.empty();
+    }
     
-    for (var x = 0; x < mess.length; x++)
+    var x = 0;
+    for ( x in mess )
     {
        msgContainer = chatMessages.append('<div/>').children(':last-child');
        
@@ -147,7 +153,7 @@ function isCallInProgress ( ) {
 function chatBind () {
     var form = jQuery('#chat_form');
     var groupID = jQuery('#group_id').val();
-    var userID = jQuery('user_id').val();
+    var userID = jQuery('#user_id').val();
     if (isCallInProgress()) {
         callInProgress.abort();
         callInProgress = null;
