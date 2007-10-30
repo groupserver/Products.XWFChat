@@ -169,7 +169,7 @@ function chatSubmit ( event ) {
     // stop the form getting submitted
 
     //Event.stop(event);
-    jQuery('#chat_form').unbind('submit') // No clean map
+    //jQuery('#chat_form').unbind('submit') // No clean map
     
     if (isCallInProgress()) {
         callInProgress.abort();
