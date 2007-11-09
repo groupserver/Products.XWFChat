@@ -62,8 +62,9 @@ form {
 	clear: both;
 }
 
-input.chatinput {
+input#message.chatinput {
 	width: 503px;
+	height: 1em;
 	padding: 5px;
 	margin-left: 0px;
 	top: 570px;
