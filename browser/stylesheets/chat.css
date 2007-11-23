@@ -3,9 +3,9 @@
 
 #chatmessages {
   border: 1px solid black;
-	height: 500px;
+	height: 38em;
 	width: 500px;
-  top: 60px;
+  top: 6em;
 	left: 0px;
   position: absolute;
   overflow: scroll;
@@ -26,9 +26,9 @@
 #chatuserspane {
 	padding: 5px;
 	border: 1px solid black;
-	height: 500px;
+	height: 38em;
 	width: 150px;
-	top: 60px;
+	top: 6em;
 	left: 550px;
   position: absolute;
 }
@@ -64,19 +64,21 @@ form {
 
 input#message.chatinput {
 	width: 503px;
-	height: 1em;
+	height: 2em;
 	padding: 5px;
 	margin-left: 0px;
-	top: 570px;
+	top: 45em;
 	left: 0px;
 	position: absolute;
 }
 
 input.chatsubmit {
 	padding: 4px;
-	top: 610px;
+	top: 48em;
 	left: 0px;
 	position: absolute;
+	padding: 0px;
+	margin: 0px;
 }
 
 .dojoTooltip {
