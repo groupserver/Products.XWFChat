@@ -29,25 +29,6 @@
 		template="browser/templates/chat_with_template.pt"
 		permission="zope2.View" />
 
-	<!-- setup our Database connectivity -->
-	<sqlos:connectionName name='ogs' />
-
-	<rdb:provideConnection name='ogs'
-		component='psycopgda.adapter.PsycopgAdapter'
-		dsn='dbi://onlinegroups@127.0.0.1:5433/onlinegroups.net' />
-
-	<adapter provides="sqlos.interfaces.IZopeSQLConnection"
-		for="zope.app.rdb.interfaces.IZopeConnection" permission="zope.Public"
-		factory="sqlos.adapter.PostgresAdapter" />
-
-	<!-- We try to create the tables at db open time -->
-	<subscriber handler=".chat.createTablesSubscriber"
-		for="zope.app.appsetup.interfaces.IDatabaseOpenedEvent" />
-
-	<browser:addMenuItem class="OFS.Folder.Folder" title="Blarg Folder"
-		description="Blarg Folder Description"
-		permission="zope.ManageContent" />
-
 	<browser:resourceDirectory name="smileys"
 		directory="browser/icons/smileys/default" permission="zope2.View" />
 		
