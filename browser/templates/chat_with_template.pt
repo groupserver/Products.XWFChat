@@ -6,17 +6,9 @@
 	<head>
     <title metal:fill-slot="title" tal:content="view/title | nothing">The title</title>
     <tal:block metal:fill-slot="javascript">
-    <script language="JavaScript" type="text/javascript">
-        var djConfig = {
-            isDebug: false,
-            bindEncoding: "UTF-8",
-            baseScriptUri:'/++resource++dojo/'
-        };
-    </script>
-    <script language="JavaScript" type="text/javascript" src="/++resource++date/DP_DateExtensions.js"></script>
-    <script language="JavaScript" type="text/javascript" src="/++resource++chat.js"></script>
-
-  </tal:block>
+      <script language="JavaScript" type="text/javascript" src="/++resource++date/DP_DateExtensions.js">&#160;</script>
+      <script language="JavaScript" type="text/javascript" src="/++resource++chat.js">&#160;</script>
+    </tal:block>
   
     <tal:block metal:fill-slot="style">
 		<link rel="stylesheet" type="text/css" 
