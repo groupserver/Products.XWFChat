@@ -38,6 +38,8 @@
           value="" />
         <input type="hidden" name="last_checksum" id="last_checksum" 
           value="" />
+        <input type="hidden" name="last_id" id="last_id" 
+          value="" />
         <input  type="hidden" name="user_id" id="user_id" 
           tal:condition="user/getId | request/form/user_id | nothing"
           tal:attributes="value user/getId | request/form/user_id" />

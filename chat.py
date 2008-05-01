@@ -193,17 +193,17 @@ class ChatQuery(object):
                         cut.c.user_id==user_id)).execute(last_seen=self.now,
                                                          last_message=self.now)
 
-    def get_latest_messages(self, since):
+    def get_latest_messages(self, last_id):
         cmt = self.chatMessageTable
-
+        
         cm_select = cmt.select()
         # TODO: We currently can't use site_id
         #cm_select.append_whereclause(cmt.c.site_id == self.site_id)
         cm_select.append_whereclause(cmt.c.group_id == self.group_id)
         #cm_select.append_whereclause(cmt.c.user_id == user_id)
         #cm_select.order_by(sa.desc(cmt.c.last_message > since))
-        cm_select.append_whereclause(cmt.c.timestamp > since)
-        cm_select.order_by(cmt.c.timestamp)
+        cm_select.append_whereclause(cmt.c.id > last_id)
+        cm_select.order_by(cmt.c.id)
 
         r = cm_select.execute()
         retval = []
@@ -254,8 +254,17 @@ class XWFChatView( BrowserView ):
         rdict['message'] = rdict['message'].decode('utf-8')
         
         rdict['last_timestamp'] = self.request.form.get( 'last_timestamp', 0 )
+        if rdict['last_timestamp'] == 'null':
+            rdict['last_timestamp'] = 0
+
         rdict['last_checksum'] = self.request.form.get( 'last_checksum', '' )
-        
+        if rdict['last_checksum'] == 'null':
+            rdict['last_checksum'] = ''
+       
+        rdict['last_id'] = self.request.form.get( 'last_id', 0 )
+        if rdict['last_id'] == 'null':
+            rdict['last_id'] = 0        
+
         rdict['user_id'] = self.request.form.get( 'user_id', 'Anon' )
         
         return rdict
@@ -275,6 +284,8 @@ class XWFChatView( BrowserView ):
         if last_timestamp in ( 'null', '' ):
             last_timestamp = str( DateTime()-( self.maximumMessageAge/86400.0 ) )
             
+        last_id = rdict['last_id']
+        
         if not skip_user_update:
             # TODO: implement site_id support
             chat_user = chatQuery.get_chat_user(user_id=rdict['user_id'])
@@ -296,7 +307,7 @@ class XWFChatView( BrowserView ):
                 
             ulist.append( user )
         
-        messages = chatQuery.get_latest_messages( last_timestamp )
+        messages = chatQuery.get_latest_messages( last_id )
         
         # backoff is converted to milliseconds
         out = {'messages': [], 'users': ulist, 'past_users': olist,

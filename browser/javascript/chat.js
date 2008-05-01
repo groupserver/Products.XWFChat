@@ -1,4 +1,5 @@
 lastTimestamp = null;
+lastId = null;
 lastChecksum = null;
 currentTimeoutId = null;
 maxChatMessages = 50;
@@ -60,7 +61,7 @@ function populate_messages( data ) {
     var chatMessageLength = null;
     var oddRow = false;
 
-    if (  mess.length != 0 ) {
+    if (  mess.length != 0 & mess.length >= 2 ) {
       chatMessages.empty();
     }
     
@@ -93,7 +94,7 @@ function populate_messages( data ) {
        //chatMessageLength = chatMessages.childNodes.length;
        chatMessageLength = chatMessages.children().length;
        if (chatMessageLength >= maxChatMessages) {
-           chatMessages.removeChild(chatMessages.childNodes[0]);
+           chatMessages.children(':first-child').empty();
        };
     
        lastTimestamp = mess[x]['timestamp']; 
@@ -101,6 +102,9 @@ function populate_messages( data ) {
        
        lastChecksum = mess[x]['checksum']; 
        jQuery('#last_checksum').val(lastChecksum);
+       
+       lastId = mess[x]['message_id'];       
+       jQuery('#last_id').val(lastId);
        
        chatMessages.each(function(){this.scrollTop = this.scrollHeight});
 
@@ -162,7 +166,8 @@ function chatBind () {
        'data':   {'group_id': groupID,
                   'user_id': userID,
                   'last_timestamp': lastTimestamp,
-                  'last_checksum': lastChecksum},
+                  'last_checksum': lastChecksum,
+                  'last_id': lastId},
        'success':  cb_chat,
        'error':    onErrorHandler,
        'complete': function(transport, json) { callInProgress = null; }
