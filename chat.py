@@ -128,7 +128,7 @@ class ChatQuery(object):
         retval = []
         if r.rowcount:
             retval = [{'user_id': x['user_id'],
-                       'real_name': self.context.get_chat_user_realname(r['user_id']),
+                       'real_name': self.context.get_chat_user_realname(x['user_id']),
                        'group_id': x['group_id'],
                        'joined': x['joined'],
                        'last_seen': x['last_seen'],
@@ -156,7 +156,7 @@ class ChatQuery(object):
                       'real_name': self.context.get_chat_user_realname(x['user_id'])} for x in r]
         else:
             self.add_chat_user(user_id)
-            retval = self.get_chat_user(self.site_id, self.group_id, user_id)
+            retval = self.get_chat_user(user_id)
         
         return retval
 
@@ -173,21 +173,25 @@ class ChatQuery(object):
                   last_message=None)
 
     def update_last_seen(self, user_id):
+        and_ = sa.and_
+
         cut = self.chatUserTable
         
         # TODO: We currently can't use site_id
         #cut.update(cut.c.site_id==self.site_id,
-        cut.update(cut.c.group_id==self.group_id,
-                   cut.c.user_id==user_id).execute(last_seen=self.now)
+        cut.update(and_(cut.c.group_id==self.group_id,
+                        cut.c.user_id==user_id)).execute(last_seen=self.now)
 
     def update_last_message(self, user_id):
+        and_ = sa.and_
+
         cut = self.chatUserTable
 
         # TODO: We currently can't use site_id        
         #cut.update(cut.c.site_id==self.site_id,
-        cut.update(cut.c.group_id==self.group_id,
-                   cut.c.user_id==user_id).execute(last_seen=self.now,
-                                            last_message=self.now)
+        cut.update(and_(cut.c.group_id==self.group_id,
+                        cut.c.user_id==user_id)).execute(last_seen=self.now,
+                                                         last_message=self.now)
 
     def get_latest_messages(self, since):
         cmt = self.chatMessageTable
@@ -196,23 +200,25 @@ class ChatQuery(object):
         # TODO: We currently can't use site_id
         #cm_select.append_whereclause(cmt.c.site_id == self.site_id)
         cm_select.append_whereclause(cmt.c.group_id == self.group_id)
-        cm_select.append_whereclause(cmt.c.user_id == user_id)
-        cm_select.order_by(sa.desc(cmt.c.last_message > since))
+        #cm_select.append_whereclause(cmt.c.user_id == user_id)
+        #cm_select.order_by(sa.desc(cmt.c.last_message > since))
+        cm_select.append_whereclause(cmt.c.timestamp > since)
+        cm_select.order_by(sa.desc(cmt.c.timestamp))
 
         r = cm_select.execute()
         retval = []
         if r.rowcount:
             retval = [{'user_id': x['user_id'],
-                       'real_name': self.context.get_chat_user_realname(r['user_id']),
+                       'real_name': self.context.get_chat_user_realname(x['user_id']),
                        'group_id': x['group_id'],
-                       'message_id': x['message_id'],
+                       'message_id': x['id'],
                        'timestamp': x['timestamp'],
                        'message': x['message']} for x in r]
         
         return retval
 
     def insert_message(self, user_id, message):
-        cut = self.chatMessageTable
+        cmt = self.chatMessageTable
         
         i = cmt.insert()
         # TODO: We currently can't use site_id
@@ -282,7 +288,7 @@ class XWFChatView( BrowserView ):
         for user in users:
             last_seen = user['last_seen']
             if last_seen:
-                time_delta = chatQuery.now - last_seen
+                time_delta = time_delta_to_now_from_string(last_seen)
                 if time_delta >= self.assumePartedAfter:
                     if time_delta <= self.pastUsersTimeLimit:
                         olist.append( user )                    
