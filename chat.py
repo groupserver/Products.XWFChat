@@ -130,9 +130,9 @@ class ChatQuery(object):
             retval = [{'user_id': x['user_id'],
                        'real_name': self.context.get_chat_user_realname(x['user_id']),
                        'group_id': x['group_id'],
-                       'joined': x['joined'],
-                       'last_seen': x['last_seen'],
-                       'last_message': x['last_message']} for x in r]
+                       'joined': x['joined'] and x['joined'].isoformat() or None,
+                       'last_seen': x['last_seen'] and x['last_seen'].isoformat() or None,
+                       'last_message': x['last_message'] and x['last_message'].isoformat() or None} for x in r]
         
         return retval
 
@@ -203,7 +203,7 @@ class ChatQuery(object):
         #cm_select.append_whereclause(cmt.c.user_id == user_id)
         #cm_select.order_by(sa.desc(cmt.c.last_message > since))
         cm_select.append_whereclause(cmt.c.timestamp > since)
-        cm_select.order_by(sa.desc(cmt.c.timestamp))
+        cm_select.order_by(cmt.c.timestamp)
 
         r = cm_select.execute()
         retval = []
@@ -212,7 +212,7 @@ class ChatQuery(object):
                        'real_name': self.context.get_chat_user_realname(x['user_id']),
                        'group_id': x['group_id'],
                        'message_id': x['id'],
-                       'timestamp': x['timestamp'],
+                       'timestamp': x['timestamp'].isoformat(),
                        'message': x['message']} for x in r]
         
         return retval
