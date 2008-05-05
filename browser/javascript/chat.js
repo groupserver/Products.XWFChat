@@ -88,7 +88,7 @@ function populate_messages( data ) {
        timeDiv.addClass('timestamp');
 
        msgDiv = msgContainer.append('<div/>').children(':last-child');
-       msgDiv.text(mess[x]['message']);
+       msgDiv.html(mess[x]['message']);
        msgDiv.addClass('message');
        
        //chatMessageLength = chatMessages.childNodes.length;
@@ -170,7 +170,8 @@ function chatBind () {
                   'last_id': lastId},
        'success':  cb_chat,
        'error':    onErrorHandler,
-       'complete': function(transport, json) { callInProgress = null; }
+       'complete': function(transport, json) { callInProgress = null; },
+       'cache': false
      });
 }
 
@@ -196,7 +197,8 @@ function chatSubmit ( event ) {
        'data':     form.serialize(),
        'success':  populate_after_submit,
        'error':    onErrorHandler,
-       'complete': function(transport, json) { callInProgress = null; }
+       'complete': function(transport, json) { callInProgress = null; },
+       'cache': false
      });
     
     return false;
