@@ -59,12 +59,7 @@ function populate_messages( data ) {
     var msgDiv = null;
     var msgContainer = null;
     var chatMessageLength = null;
-    var oddRow = false;
 
-    if (  mess.length != 0 & mess.length >= 2 ) {
-      chatMessages.empty();
-    }
-    
     var x = 0;
     for ( x in mess )
     {
@@ -91,10 +86,11 @@ function populate_messages( data ) {
        msgDiv.html(mess[x]['message']);
        msgDiv.addClass('message');
        
-       //chatMessageLength = chatMessages.childNodes.length;
        chatMessageLength = chatMessages.children().length;
        if (chatMessageLength >= maxChatMessages) {
-           chatMessages.children(':first-child').empty();
+          for (var ind = 0; ind < (chatMessageLength - maxChatMessages); ind++) {
+               chatMessages.children(':first-child').remove()
+          };
        };
     
        lastTimestamp = mess[x]['timestamp']; 
