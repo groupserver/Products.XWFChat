@@ -65,30 +65,38 @@ form {
 input#message.chatinput {
 	width: 503px;
 	height: 2em;
-	padding: 5px;
-	margin-left: 0px;
+	padding: 1px;
+	margin: 0px;
 	top: 45em;
 	left: 0px;
 	position: absolute;
 }
 
 input.chatsubmit {
+        display: none;
+/*
 	padding: 4px;
 	top: 48em;
 	left: 0px;
 	position: absolute;
 	padding: 0px;
 	margin: 0px;
-}
-
-.dojoTooltip {
-	padding: 5px;
-	background-color: #EFF0ED;
-	border: solid 1px #5C791C;
+*/
 }
 
 #footerlinks {
   position: absolute;
   top: 650px;
   left: 0px;
+}
+
+#chat-o-swirl {
+  background-image: url("/++resource++anim/wait.gif");
+  background-repeat: no-repeat;
+  padding-left: 18px;
+  display: none;
+  color: #aaaaaa;
+  position: absolute;
+  top: 45em;
+  left: 507px;
 }
