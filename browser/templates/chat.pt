@@ -1,14 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal">
 	<head>
     <title>The title</title>
     
-	<link rel="stylesheet" type="text/css" href="/++resource++chat.css">
+    <link rel="stylesheet" type="text/css" href="/++resource++chat.css">&#160;</link>
    
     <script language="JavaScript" type="text/javascript" src="/++resource++date/DP_DateExtensions.js">&#160;</script>
     <script language="JavaScript" type="text/javascript" src="/++resource++prototype/prototype.js">&#160;</script>
-    <script language="JavaScript" type="text/javascript" src="/++resource++chat.js">&#160;</script>
+    <script language="JavaScript" type="text/javascript" src="/++resource++chat-20080514-1.js">&#160;</script>
 
   </head> 
   <body>
@@ -27,7 +28,7 @@
        </div>
       <form id="chat_form" method="POST" action="submit_message" ACCEPT_CHARSET="UTF-8">
           <input type="hidden" name="_charset_" id="_charset_" />
-          <input type="hidden" name="last_timestamp" id="last_timesatamp"
+          <input type="hidden" name="last_timestamp" id="last_timestamp"
             value="" />
           <input type="hidden" name="last_checksum" id="last_checksum" 
             value="" />

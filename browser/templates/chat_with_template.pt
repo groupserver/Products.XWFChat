@@ -7,12 +7,12 @@
     <title metal:fill-slot="title" tal:content="view/title | nothing">The title</title>
     <tal:block metal:fill-slot="javascript">
       <script language="JavaScript" type="text/javascript" src="/++resource++date/DP_DateExtensions.js">&#160;</script>
-      <script language="JavaScript" type="text/javascript" src="/++resource++chat.js">&#160;</script>
+      <script language="JavaScript" type="text/javascript" src="/++resource++chat-20080514-1.js">&#160;</script>
     </tal:block>
   
     <tal:block metal:fill-slot="style">
 		<link rel="stylesheet" type="text/css" 
-		  href="/++resource++chat-20071123.css"/>
+		  href="/++resource++chat-20080507-2.css"/>
     </tal:block>
   </head> 
  
@@ -34,7 +34,7 @@
       <form id="chat_form" method="POST" action="submit_message"
         ACCEPT_CHARSET="UTF-8">
         <input type="hidden" name="_charset_" id="_charset_" />
-        <input type="hidden" name="last_timestamp" id="last_timesatamp"
+        <input type="hidden" name="last_timestamp" id="last_timestamp"
           value="" />
         <input type="hidden" name="last_checksum" id="last_checksum" 
           value="" />
@@ -47,9 +47,10 @@
           tal:attributes="value python:context.Scripts.get.group_object().getId()" />
         <input class="chatinput" name="message" id="message" value="" />
         <input class="chatsubmit" type="submit" id="submit" 
-          name="submit" value="send" />
+               name="submit" value="send" />
       </form>
 
-    <div id="dojoDebugOutput"></div>
+      <div id="chat-o-swirl">talking to server...</div>
+
   </body>
 </html>
