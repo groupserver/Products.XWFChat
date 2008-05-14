@@ -113,6 +113,8 @@ function populate_messages( data ) {
 };
 
 function resetBind() {
+    jQuery('#chat-o-swirl').css('display', 'none');
+
     if (isCallInProgress()) {
         callInProgress.abort();
         callInProgress = null;
@@ -157,6 +159,8 @@ function chatBind () {
         callInProgress = null;
     };
 
+    jQuery('#chat-o-swirl').css('display', 'block');
+
     callInProgress = jQuery.ajax(
       {'url':     'cb_chat',
        'data':   {'group_id': groupID,
@@ -187,6 +191,8 @@ function chatSubmit ( event ) {
     jQuery('#message').blur();
     jQuery('#submit').attr("disabled","disabled");
     jQuery('#submit').val('Sending\u2026');
+
+    jQuery('#chat-o-swirl').css('display', 'block');
 
     callInProgress = jQuery.ajax(
       {'url':      'submit_message',
