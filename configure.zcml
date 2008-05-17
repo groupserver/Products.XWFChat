@@ -29,6 +29,35 @@
 		template="browser/templates/chat_with_template.pt"
 		permission="zope2.View" />
 
+	<browser:page for=".interfaces.IGSChat"
+		class=".chat.XWFChatView" name="chatnoskin.html"
+		template="browser/templates/chat.pt"
+		permission="zope2.View" />
+
+	<browser:page for=".interfaces.IGSChat"
+		class=".chat.XWFChatView" name="chatstatic.html"
+		template="browser/templates/chatstatic.pt"
+		permission="zope2.View" />
+
+	<!-- setup our Database connectivity -->
+	<sqlos:connectionName name='ogs' />
+
+	<rdb:provideConnection name='ogs'
+		component='psycopgda.adapter.PsycopgAdapter'
+		dsn='dbi://onlinegroups@vida.onlinegroups.net:5432/onlinegroups' />
+
+	<adapter provides="sqlos.interfaces.IZopeSQLConnection"
+		for="zope.app.rdb.interfaces.IZopeConnection" permission="zope.Public"
+		factory="sqlos.adapter.PostgresAdapter" />
+
+	<!-- We try to create the tables at db open time -->
+	<subscriber handler=".chat.createTablesSubscriber"
+		for="zope.app.appsetup.interfaces.IDatabaseOpenedEvent" />
+
+	<browser:addMenuItem class="OFS.Folder.Folder" title="Blarg Folder"
+		description="Blarg Folder Description"
+		permission="zope.ManageContent" />
+
 	<browser:resourceDirectory name="smileys"
 		directory="browser/icons/smileys/default" permission="zope2.View" />
 		
@@ -40,9 +69,9 @@
 	<!-- <browser:resourceDirectory name="dojo"
 		directory="browser/javascript/dojo/" permission="zope2.View" /> -->
 
-	<browser:resource name="chat-20071123.css"
+	<browser:resource name="chat-20080507-2.css"
 		file="browser/stylesheets/chat.css" permission="zope2.Public" />
-	<browser:resource name="chat.js"
+	<browser:resource name="chat-20080514-1.js"
 		file="browser/javascript/chat.js" permission="zope2.Public" />
 
 	<interface interface=".interfaces.IGSGroupFolder"
