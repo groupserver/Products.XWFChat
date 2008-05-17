@@ -27,7 +27,8 @@
 			<div id="titlebar">
 				<span class="logo"></span>
 				<span class="group"></span>
-				<span class="division" tal:define="division_object python:context.Scripts.get.division_object()" tal:content="division_object/title_or_id | nothing">Division Name</span>
+				<span class="division" 
+    tal:content="python:view.siteInfo.get_name()">Division Name</span>
 			</div>
 			<div id="utilities">
 				<div id="utilitylinks">
