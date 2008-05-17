@@ -34,7 +34,7 @@ function populate_user_list( user_container_object, data ) {
            
            userDiv = userContainer.append("<div/>").children(':last-child');
            userDiv.attr('id', 'chatuserid_' + data[x]['user_id']);
-           userDiv.html(data[x]['user_realname']);
+           userDiv.text(data[x]['real_name']);
            userDiv.addClass('chatuserid');
            
            timestamp = Date.parseIso8601(data[x]['last_message']);
@@ -74,7 +74,7 @@ function populate_messages( data ) {
        oddRow = !oddRow;
        
        userDiv = msgContainer.append('<div/>').children(':last-child');
-       userDiv.text(mess[x]['user_realname']);
+       userDiv.text(mess[x]['real_name']);
        userDiv.addClass('userid');
        
        timeDiv = msgContainer.append('<div/>').children(':last-child');

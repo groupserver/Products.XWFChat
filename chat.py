@@ -23,6 +23,7 @@ import Products.GSContent
 
 import sqlalchemy as sa
 from sqlalchemy.exceptions import NoSuchTableError
+from sqlalchemy.util import reversed
 
 _thread_lock = ThreadLock.allocate_lock()
 
@@ -203,17 +204,18 @@ class ChatQuery(object):
         #cm_select.append_whereclause(cmt.c.user_id == user_id)
         #cm_select.order_by(sa.desc(cmt.c.last_message > since))
         cm_select.append_whereclause(cmt.c.id > last_id)
-        cm_select.order_by(cmt.c.id)
-
+        cm_select.order_by(sa.desc(cmt.c.id))
+        cm_select.limit = 50
         r = cm_select.execute()
         retval = []
         if r.rowcount:
+            r = reversed(r.fetchmany())
             retval = [{'user_id': x['user_id'],
                        'real_name': self.context.get_chat_user_realname(x['user_id']),
                        'group_id': x['group_id'],
                        'message_id': x['id'],
                        'timestamp': x['timestamp'].isoformat(),
-                       'message': x['message']} for x in r]
+                       'message': markup_message(x['message'])} for x in r]
         
         return retval
 
@@ -262,7 +264,7 @@ class XWFChatView( BrowserView ):
             rdict['last_checksum'] = ''
        
         rdict['last_id'] = self.request.form.get( 'last_id', 0 )
-        if rdict['last_id'] == 'null':
+        if rdict['last_id'] == 'null' or not rdict['last_id']:
             rdict['last_id'] = 0        
 
         rdict['user_id'] = self.request.form.get( 'user_id', 'Anon' )
@@ -280,10 +282,6 @@ class XWFChatView( BrowserView ):
 
         chatQuery = ChatQuery(self, da, '', rdict['group_id'])
         
-        last_timestamp = rdict['last_timestamp']
-        if last_timestamp in ( 'null', '' ):
-            last_timestamp = str( DateTime()-( self.maximumMessageAge/86400.0 ) )
-            
         last_id = rdict['last_id']
         
         if not skip_user_update:

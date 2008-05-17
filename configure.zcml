@@ -40,10 +40,10 @@
 	<!-- <browser:resourceDirectory name="dojo"
 		directory="browser/javascript/dojo/" permission="zope2.View" /> -->
 
-	<browser:resource name="chat-20071123.css"
-		file="browser/stylesheets/chat.css" permission="zope2.Public" />
-	<browser:resource name="chat.js"
-		file="browser/javascript/chat.js" permission="zope2.Public" />
+        <browser:resource name="chat-20080507-2.css"
+                file="browser/stylesheets/chat.css" permission="zope2.Public" />
+        <browser:resource name="chat-20080514-1.js"
+                file="browser/javascript/chat.js" permission="zope2.Public" />
 
 	<interface interface=".interfaces.IGSGroupFolder"
 		type="zope.app.content.interfaces.IContentType" />
