@@ -106,8 +106,11 @@ class ChatQuery(object):
     def __init__(self, context, da, site_id, group_id):
         self.context = context
         
-        self.chatUserTable = da.createMapper('chat_user')[1]
-        self.chatMessageTable = da.createMapper('chat_message')[1]
+        engine = da.engine
+        metadata = sa.BoundMetaData(engine)
+
+        self.chatUserTable = sa.Table('chat_user', metadata, autoload=True)
+        self.chatMessageTable = sa.Table('chat_message', metadata, autoload=True)
 
         self.now = datetime.datetime.now()
 
@@ -209,7 +212,7 @@ class ChatQuery(object):
         r = cm_select.execute()
         retval = []
         if r.rowcount:
-            r = reversed(r.fetchmany())
+            r = reversed(r.fetchmany(50))
             retval = [{'user_id': x['user_id'],
                        'real_name': self.context.get_chat_user_realname(x['user_id']),
                        'group_id': x['group_id'],
