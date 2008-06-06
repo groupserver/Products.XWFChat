@@ -1,60 +1,50 @@
-#chatmessagespane {
+#chatmessages, input#message.chatinput {
+	width: 38.63em;
 }
 
 #chatmessages {
-  border: 1px solid black;
-	height: 38em;
-	width: 500px;
-  top: 6em;
-	left: 0px;
-  position: absolute;
   overflow: scroll;
 }
-
-.chatmessagerowodd {
+#chatmessages, #chatuserspane {
+	border: 1px solid black;
+	height: 38.63em;
+  float: left;
+}
+.chatmessagerowodd, .chatmessageroweven {
 	border-top: 1px solid #5C791C;
-	padding: 5px;
+	padding: 0.69em;
+}
+.chatmessagerowodd {
 	background-color: #F8F8FF;
 }
-
 .chatmessageroweven {
-	border-top: 1px solid #5C791C;
-	padding: 5px;
 	background-color: #EFF0ED;
 }
 
 #chatuserspane {
-	padding: 5px;
-	border: 1px solid black;
-	height: 38em;
-	width: 150px;
-	top: 6em;
-	left: 550px;
-  position: absolute;
+	padding: 0.69em;
+	margin: 0px 0px 0px 1.39em;
+	width: 12.6em;
+}
+#chatuserspane h3 {
+  margin: 0px;
 }
 
 #chatusers {
 	overflow: auto;
 }
-
-#chatusers .chatuserid {
-	margin: 0 5px 0 0;
+#chatusers .chatuserid, #chatpastusers .chatuserid {
+	margin: 1.39em 0px 1.39em 0.69em;
 	color: blue;
 }
-
-#chatpastusers .chatuserid {
-	margin: 0 5px 0 0;
-	color: blue;
+.userid, .timestamp {
+	color: #5C791C;
 }
-
 .userid {
-	color: #5C791C;
 	float: left;
-	margin: 0 5px 0 0;
+	padding-right: 0.69em;
 }
-
 .timestamp {
-	color: #5C791C;
 	clear: right;
 }
 
@@ -63,40 +53,21 @@ form {
 }
 
 input#message.chatinput {
-	width: 503px;
-	height: 2em;
+	height: 2.08em;
 	padding: 1px;
 	margin: 0px;
-	top: 45em;
-	left: 0px;
-	position: absolute;
+	display: inline;
 }
 
 input.chatsubmit {
-        display: none;
-/*
-	padding: 4px;
-	top: 48em;
-	left: 0px;
-	position: absolute;
-	padding: 0px;
-	margin: 0px;
-*/
-}
-
-#footerlinks {
-  position: absolute;
-  top: 650px;
-  left: 0px;
+  display: none;
 }
 
 #chat-o-swirl {
   background-image: url("/++resource++anim/wait.gif");
   background-repeat: no-repeat;
-  padding-left: 18px;
+  padding-left: 1.39em;
   display: none;
   color: #aaaaaa;
-  position: absolute;
-  top: 45em;
-  left: 507px;
 }
+
