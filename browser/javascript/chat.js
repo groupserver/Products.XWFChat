@@ -159,7 +159,7 @@ function chatBind () {
         callInProgress = null;
     };
 
-    jQuery('#chat-o-swirl').css('display', 'block');
+    jQuery('#chat-o-swirl').css('display', 'inline');
 
     callInProgress = jQuery.ajax(
       {'url':     'cb_chat',
@@ -192,7 +192,7 @@ function chatSubmit ( event ) {
     jQuery('#submit').attr("disabled","disabled");
     jQuery('#submit').val('Sending\u2026');
 
-    jQuery('#chat-o-swirl').css('display', 'block');
+    jQuery('#chat-o-swirl').css('display', 'inline');
 
     callInProgress = jQuery.ajax(
       {'url':      'submit_message',
