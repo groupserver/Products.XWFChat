@@ -7,12 +7,12 @@
     <title metal:fill-slot="title" tal:content="view/title | nothing">The title</title>
     <tal:block metal:fill-slot="javascript">
       <script language="JavaScript" type="text/javascript" src="/++resource++date/DP_DateExtensions.js">&#160;</script>
-      <script language="JavaScript" type="text/javascript" src="/++resource++chat-20080514-1.js">&#160;</script>
+      <script language="JavaScript" type="text/javascript" src="/++resource++chat-20080609.js">&#160;</script>
     </tal:block>
   
     <tal:block metal:fill-slot="style">
 		<link rel="stylesheet" type="text/css" 
-		  href="/++resource++chat-20080507-2.css"/>
+		  href="/++resource++chat-20080609.css"/>
     </tal:block>
   </head> 
  
