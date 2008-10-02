@@ -1,20 +1,12 @@
-import sys
 import re
 import datetime
-from AccessControl.SecurityInfo import ClassSecurityInfo
 from Globals import InitializeClass
 from Products.Five import BrowserView
 
-from zope.app.container import constraints
-
-from DateTime import DateTime
-from zope.app.datetimeutils import DateTimeParser
+from zope.app.datetimeutils import DateTimeParser #@UnresolvedImport
 
 from zif.jsonserver.jsoncomponent import JSONWriter #@UnresolvedImport
 from feedparser import _HTMLSanitizer, _sanitizeHTML as sanitizeHTML #@UnresolvedImport
-
-from formencode import validators #@UnresolvedImport
-import time
 
 import md5
 
@@ -22,7 +14,6 @@ import ThreadLock
 import Products.GSContent 
 
 import sqlalchemy as sa
-from sqlalchemy.exceptions import NoSuchTableError
 from sqlalchemy.util import reversed
 
 _thread_lock = ThreadLock.allocate_lock()
@@ -106,12 +97,9 @@ class ChatQuery(object):
     def __init__(self, context, da, site_id, group_id):
         self.context = context
         
-        engine = da.engine
-        metadata = sa.BoundMetaData(engine)
-
-        self.chatUserTable = sa.Table('chat_user', metadata, autoload=True)
-        self.chatMessageTable = sa.Table('chat_message', metadata, autoload=True)
-
+        self.chatUserTable = da.createTable('chat_user')
+        self.chatMessageTable = da.createTable('chat_message')
+        
         self.now = datetime.datetime.now()
 
         # TODO: We currently can't use site_id
