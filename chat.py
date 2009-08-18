@@ -18,6 +18,9 @@ from sqlalchemy.util import reversed
 
 _thread_lock = ThreadLock.allocate_lock()
 
+import logging
+log = logging.getLogger("XWFChat")
+
 def time_delta_to_now_from_string( time_string ):
     """ Return a time delta as the number of seconds in past, given a datetime string.
     
@@ -125,7 +128,7 @@ class ChatQuery(object):
                        'joined': x['joined'] and x['joined'].isoformat() or None,
                        'last_seen': x['last_seen'] and x['last_seen'].isoformat() or None,
                        'last_message': x['last_message'] and x['last_message'].isoformat() or None} for x in r]
-        
+
         return retval
 
     def get_chat_user(self, user_id):
@@ -163,7 +166,7 @@ class ChatQuery(object):
                   joined=self.now,
                   last_seen=self.now,
                   last_message=None)
-
+        
     def update_last_seen(self, user_id):
         and_ = sa.and_
 
@@ -171,7 +174,7 @@ class ChatQuery(object):
         
         # TODO: We currently can't use site_id
         #cut.update(cut.c.site_id==self.site_id,
-        cut.update(and_(cut.c.group_id==self.group_id,
+        r = cut.update(and_(cut.c.group_id==self.group_id,
                         cut.c.user_id==user_id)).execute(last_seen=self.now)
 
     def update_last_message(self, user_id):
@@ -181,10 +184,10 @@ class ChatQuery(object):
 
         # TODO: We currently can't use site_id        
         #cut.update(cut.c.site_id==self.site_id,
-        cut.update(and_(cut.c.group_id==self.group_id,
+        r = cut.update(and_(cut.c.group_id==self.group_id,
                         cut.c.user_id==user_id)).execute(last_seen=self.now,
                                                          last_message=self.now)
-
+        
     def get_latest_messages(self, last_id):
         cmt = self.chatMessageTable
         
@@ -207,7 +210,6 @@ class ChatQuery(object):
                        'message_id': x['id'],
                        'timestamp': x['timestamp'].isoformat(),
                        'message': markup_message(x['message'])} for x in r]
-        
         return retval
 
     def insert_message(self, user_id, message):
@@ -216,11 +218,10 @@ class ChatQuery(object):
         i = cmt.insert()
         # TODO: We currently can't use site_id
         #i.execute(site_id=self.site_id,
-        i.execute(group_id=self.group_id,
+        r = i.execute(group_id=self.group_id,
                   user_id=user_id,
                   timestamp=self.now,
                   message=message)
-
 
 class XWFChatView( BrowserView ):
     defaultBackoff = 14 # seconds
