@@ -3,7 +3,7 @@ import datetime
 from Globals import InitializeClass
 from Products.Five import BrowserView
 
-from zope.app.datetimeutils import DateTimeParser #@UnresolvedImport
+from zope.datetime import DateTimeParser #@UnresolvedImport
 
 from zif.jsonserver.jsoncomponent import JSONWriter #@UnresolvedImport
 from feedparser import _HTMLSanitizer, _sanitizeHTML as sanitizeHTML #@UnresolvedImport
