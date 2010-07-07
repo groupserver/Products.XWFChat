@@ -50,10 +50,4 @@
 	<browser:page for="*" template="browser/skin/gs_template.pt"
 		name="gs_template" permission="zope.Public" />
 
-	<browser:layer name="tofu" />
-	<browser:skin name="Groupserver" layers="tofu default" />
-
-	<browser:page for="*" template="browser/skin/tofu_template.pt"
-		name="gs_template" layer="tofu" permission="zope.Public" />
-
 </configure>

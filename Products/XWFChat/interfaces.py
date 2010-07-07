@@ -11,3 +11,4 @@ class IGSChat(Interface):
 
 class IGroupFolder(Interface):
     pass
+
