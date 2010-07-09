@@ -1,6 +1,6 @@
 import re
 import datetime
-from Globals import InitializeClass
+from AccessControl.class_init import InitializeClass
 from Products.Five import BrowserView
 
 from zope.datetime import DateTimeParser #@UnresolvedImport
