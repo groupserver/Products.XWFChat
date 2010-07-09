@@ -9,14 +9,14 @@ from zif.jsonserver.jsoncomponent import JSONWriter #@UnresolvedImport
 from feedparser import _HTMLSanitizer, _sanitizeHTML as sanitizeHTML #@UnresolvedImport
 
 import md5
-from threading import Lock
+from threading import RLock
 
 import Products.GSContent 
 
 import sqlalchemy as sa
 from sqlalchemy.util import reversed
 
-_thread_lock = Lock()
+_thread_lock = RLock()
 
 import logging
 log = logging.getLogger("XWFChat")
