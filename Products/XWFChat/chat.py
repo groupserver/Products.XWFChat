@@ -198,6 +198,10 @@ class ChatQuery(object):
         #cm_select.append_whereclause(cmt.c.user_id == user_id)
         #cm_select.order_by(sa.desc(cmt.c.last_message > since))
         cm_select.append_whereclause(cmt.c.id > last_id)
+        
+        # only fetch 50 messages, and only in the last day
+        day_ago = self.now-datetime.timedelta(1)
+        cm_select.append_whereclause(cmt.c.timestamp >= day_ago)
         cm_select.order_by(sa.desc(cmt.c.id))
         cm_select.limit = 50
         r = cm_select.execute()
