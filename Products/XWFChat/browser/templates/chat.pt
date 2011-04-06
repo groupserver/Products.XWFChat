@@ -39,7 +39,7 @@
           <input type="hidden" name="group_id" 
             tal:attributes="value python:request.get('group_id', 'default')" />
           <input class="chatinput" name="message" id="message" value="" />
-          <input class="chatsubmit" type="submit" id="submit" name="submit" value="send" />
+          <!-- <input class="chatsubmit" type="submit" id="submit" name="submit" value="send" /> -->
       </form>
 
 

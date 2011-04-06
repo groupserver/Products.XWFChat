@@ -21,18 +21,28 @@ _thread_lock = RLock()
 import logging
 log = logging.getLogger("XWFChat")
 
+def time_delta_to_now( dt ):
+    """ Return a time delta as the number of seconds in past.
+    
+    """
+    now_dt = datetime.datetime.now()
+    delta_dt = now_dt-dt
+    
+    return ( delta_dt.days*86400+delta_dt.seconds )
+
 def time_delta_to_now_from_string( time_string ):
     """ Return a time delta as the number of seconds in past, given a datetime string.
     
     """
     dtparser = DateTimeParser()
-    now_dt = datetime.datetime.now()
-        
+    
+    decimaloffset = time_string.find('.')
+    if decimaloffset > 0:
+        time_string = time_string[:decimaloffset]
+
     dt = datetime.datetime( *dtparser.parse( str( time_string ) )[:-1] )
-    
-    delta_dt = now_dt-dt
-    
-    return ( delta_dt.days*86400+delta_dt.seconds )
+
+    return time_delta_to_now( dt )    
 
 substitutions = ( ( '(?i)(http://|https://)(.+?)(\&lt;|\&gt;|\)|\]|\}|\"|\'|$|\s)', 
                    '<a href="\g<1>\g<2>">\g<1>\g<2></a>\g<3>' ), 
@@ -284,7 +294,7 @@ class XWFChatView( BrowserView ):
             # TODO: implement site_id support
             chat_user = chatQuery.get_chat_user(user_id=rdict['user_id'])
             # an optimisation to not update the last seen time every iteration
-            if time_delta_to_now_from_string(chat_user[-1]['last_seen']) >= self.updateLastSeenAfter:
+            if time_delta_to_now(chat_user[-1]['last_seen']) >= self.updateLastSeenAfter:
                 chatQuery.update_last_seen(user_id=rdict['user_id'])
         
         users = chatQuery.get_chat_users()

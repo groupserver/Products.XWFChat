@@ -45,8 +45,8 @@
         <input type="hidden" name="group_id" id="group_id"
           tal:attributes="value python:context.Scripts.get.group_object().getId()" />
         <input class="chatinput" name="message" id="message" value="" />
-        <input class="chatsubmit" type="submit" id="submit" 
-               name="submit" value="send" />
+        <!-- <input class="chatsubmit" type="submit" id="submit" 
+               name="submit" value="send" /> -->
       </form>
 
       <div id="chat-o-swirl">talking to server...</div>
