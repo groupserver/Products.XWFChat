@@ -14,7 +14,6 @@ from threading import RLock
 import Products.GSContent 
 
 import sqlalchemy as sa
-from sqlalchemy.util import reversed
 
 _thread_lock = RLock()
 
