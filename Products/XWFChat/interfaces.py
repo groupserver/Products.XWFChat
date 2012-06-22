@@ -6,9 +6,6 @@ class IFolder(Interface):
 class IGSGroupFolder(Interface):
     pass
 
-class IGSChat(Interface):
-    pass
-
 class IGroupFolder(Interface):
     pass
 

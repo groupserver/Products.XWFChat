@@ -1,49 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configure xmlns="http://namespaces.zope.org/zope"
 	xmlns:browser="http://namespaces.zope.org/browser"
-	xmlns:rdb="http://namespaces.zope.org/rdb"
-	xmlns:sqlos="http://namespaces.sqlobject.org/sqlos"
 	xmlns:five="http://namespaces.zope.org/five">
 
-	<class class="OFS.Folder.Folder">
-	    <implements interface="zope.app.folder.interfaces.IFolder" />
-        </class>
-
-	<browser:page for="*" class=".chat.XWFChatView"
-		name="hello.html" template="browser/templates/standard_template.pt"
-		permission="zope2.View" />
-
-	<browser:page for="zope.app.folder.interfaces.IFolder"
-		class=".chat.XWFChatView" attribute="cb_chat" name="cb_chat"
-		permission="zope2.View" />
-	<browser:page for="zope.app.folder.interfaces.IFolder"
-		class=".chat.XWFChatView" attribute="submit_message"
-		name="submit_message" permission="zope2.View" />
-
-	<browser:page for=".interfaces.IGSChat"
-		class=".chat.XWFChatView" name="chat.html"
-		template="browser/templates/chat_with_template.pt"
-		permission="zope2.View" />
-
-	<browser:resourceDirectory name="smileys"
-		directory="browser/icons/smileys/default" permission="zope2.View" />
-		
-	<browser:resourceDirectory name="icons"
-		directory="browser/icons" permission="zope2.View" />
-
-        <!-- Moved to GSContent -->
-
-	<!-- <browser:resourceDirectory name="dojo"
-		directory="browser/javascript/dojo/" permission="zope2.View" /> -->
-
-        <browser:resource name="chat-20080609.css"
-                file="browser/stylesheets/chat.css" permission="zope2.Public" />
-        <browser:resource name="chat-20080609.js"
-                file="browser/javascript/chat.js" permission="zope2.Public" />
-
 	<interface interface=".interfaces.IGSGroupFolder"
-		type="zope.app.content.interfaces.IContentType" />
-	<interface interface=".interfaces.IGSChat"
 		type="zope.app.content.interfaces.IContentType" />
 	
 	<browser:page for="*" template="browser/skin/gs_template.pt"
