@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configure xmlns="http://namespaces.zope.org/zope"
-	xmlns:browser="http://namespaces.zope.org/browser"
-	xmlns:five="http://namespaces.zope.org/five">
-
-	<interface interface=".interfaces.IGSGroupFolder"
-		type="zope.app.content.interfaces.IContentType" />
-        <interface interface=".interfaces.IGSGroupFolder"
-                type="zope.app.content.interfaces.IContentType" />
-	
-	<browser:page for="*" template="browser/skin/gs_template.pt"
-		name="gs_template" permission="zope.Public" />
-
+           xmlns:browser="http://namespaces.zope.org/browser"
+           xmlns:five="http://namespaces.zope.org/five">
+  <interface interface=".interfaces.IGSGroupFolder"
+             type="zope.app.content.interfaces.IContentType" />
+  <browser:page 
+    for="*" 
+    template="browser/skin/gs_template.pt"
+    name="gs_template" 
+    permission="zope.Public" />
 </configure>
