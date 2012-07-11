@@ -5,6 +5,8 @@
 
 	<interface interface=".interfaces.IGSGroupFolder"
 		type="zope.app.content.interfaces.IContentType" />
+        <interface interface=".interfaces.IGSGroupFolder"
+                type="zope.app.content.interfaces.IContentType" />
 	
 	<browser:page for="*" template="browser/skin/gs_template.pt"
 		name="gs_template" permission="zope.Public" />

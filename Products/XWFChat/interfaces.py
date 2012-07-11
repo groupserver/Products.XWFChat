@@ -9,3 +9,5 @@ class IGSGroupFolder(Interface):
 class IGroupFolder(Interface):
     pass
 
+class IGSChat(Interface):
+    pass
